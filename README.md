@@ -11,7 +11,7 @@ Passwords can currently be generated:
 * Letters, Numbers & Symbols
 * Replace password to hash of Basic Auth (bcrypt.hashSync)
 
-![commands](./imgs/commands.png)
+![commands](https://raw.githubusercontent.com/ddniel16/vscode-gPassword/main/imgs/commands.png)
 
 ## Settings
 
@@ -20,7 +20,7 @@ By default, passwords are generated with a random size between 20 and 25 charact
 * `gpassword.randomLengthMin`: Between 15 and 54
 * `gpassword.randomLengthMax`: Between 16 and 55
 
-![settings](./imgs/settings.png)
+![settings](https://raw.githubusercontent.com/ddniel16/vscode-gPassword/main/imgs/settings.png)
 
 > If the minimum value is defined greater than the maximum value, a controlled error will occur.
 
