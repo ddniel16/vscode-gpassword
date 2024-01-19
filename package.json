@@ -2,6 +2,7 @@
   "name": "gpassword",
   "displayName": "gPassword",
   "description": "Password generator",
+  "icon": "img/icon.jpeg",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.85.0"
