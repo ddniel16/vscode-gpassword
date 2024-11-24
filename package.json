@@ -1,0 +1,150 @@
+{
+  "name": "gpassword",
+  "displayName": "Generator password",
+  "description": "Tool to generate passwords and hashes easily.",
+  "publisher": "ddniel16",
+  "icon": "imgs/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ddniel16/vscode-gpassword"
+  },
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "security",
+    "password",
+    "bcrypt",
+    "base64",
+    "basic auth"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gpassword.Letters",
+        "title": "Letters only",
+        "category": "gPassword"
+      },
+      {
+        "command": "gpassword.LettersNumbers",
+        "title": "Letters and numbers",
+        "category": "gPassword"
+      },
+      {
+        "command": "gpassword.AllCharacters",
+        "title": "Letters, Numbers & Symbols",
+        "category": "gPassword"
+      },
+      {
+        "command": "gpassword.passwordToBasicAuth",
+        "title": "Replace password to hash of Basic Auth (bcrypt.hashSync)",
+        "category": "gPassword"
+      },
+      {
+        "command": "gpassword.BaseEncode",
+        "title": "Base64 Encode",
+        "category": "gPassword"
+      },
+      {
+        "command": "gpassword.BaseDecode",
+        "title": "Base64 Decode",
+        "category": "gPassword"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "gpassword.submenu",
+          "when": "editorTextFocus && !editorReadonly",
+          "group": "gpassword"
+        }
+      ],
+      "gpassword.submenu": [
+        {
+          "command": "gpassword.BaseDecode",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && editorHasSelection"
+        },
+        {
+          "command": "gpassword.BaseEncode",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && editorHasSelection"
+        },
+        {
+          "command": "gpassword.passwordToBasicAuth",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && editorHasSelection"
+        },
+        {
+          "command": "gpassword.AllCharacters",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
+        },
+        {
+          "command": "gpassword.LettersNumbers",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
+        },
+        {
+          "command": "gpassword.Letters",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "gpassword.submenu",
+        "label": "gPassword"
+      }
+    ],
+    "configuration": {
+      "title": "gPassword",
+      "properties": {
+        "gpassword.randomLengthMin": {
+          "type": "integer",
+          "default": 20,
+          "description": "Minimum characters",
+          "minimum": 15,
+          "maximum": 54
+        },
+        "gpassword.randomLengthMax": {
+          "type": "integer",
+          "default": 25,
+          "description": "Maximum characters",
+          "minimum": 16,
+          "maximum": 55
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1"
+  }
+}
