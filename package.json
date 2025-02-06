@@ -1,7 +1,7 @@
 {
   "name": "gpassword",
-  "displayName": "Generator password",
-  "description": "Tool to generate passwords and hashes easily.",
+  "displayName": "Generator password & Encoder Tools",
+  "description": "Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.",
   "publisher": "ddniel16",
   "icon": "imgs/icon.png",
   "repository": {
@@ -20,7 +20,9 @@
     "password",
     "bcrypt",
     "base64",
-    "basic auth"
+    "basic auth",
+    "jwt decode",
+    "WordPress Salt"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -54,6 +56,20 @@
       {
         "command": "gpassword.BaseDecode",
         "title": "Base64 Decode",
+        "category": "gPassword"
+      },
+      {
+        "command": "gpassword.WordPressSaltYml",
+        "title": "WordPress Salt YML",
+        "category": "gPassword"
+      },
+      {
+        "command": "gpassword.WordPressSaltEnv",
+        "title": "WordPress Salt ENV",
+        "category": "gPassword"
+      },{
+        "command": "gpassword.JWT",
+        "title": "JWT Decode",
         "category": "gPassword"
       }
     ],

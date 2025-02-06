@@ -1,13 +1,12 @@
-# gPassword
+# gPassword & Encoder Tools
 
-[![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/v/ddniel16.gpassword.svg)](https://marketplace.visualstudio.com/items?itemName=ddniel16.gpassword)
 [![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/i/ddniel16.gpassword.svg)](https://marketplace.visualstudio.com/items?itemName=ddniel16.gpassword)
 
 ```vscode
 ext install ddniel16.gpassword
 ```
 
-gPassword is a Visual Studio Code extension to generate passwords.
+Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.
 
 ## Features
 
@@ -19,6 +18,8 @@ Passwords can currently be generated:
 - Replace password to hash of Basic Auth (bcrypt.hashSync)
 - Base64 encode
 - Base64 decode
+- WordPress Salt Env|Yaml
+- JWT decode
 
 ![commands](https://raw.githubusercontent.com/ddniel16/vscode-gPassword/main/imgs/commands.png)
 
