@@ -1,43 +1,50 @@
 export class Base64 {
-  window: any;
+  editorWindow: any;
 
-  constructor(window: any) {
-    this.window = window;
+  constructor(editorWindow: any) {
+    this.editorWindow = editorWindow;
   }
 
+  /**
+   * Encodes the currently selected text(s) in the active editor to Base64.
+   * Shows an information message upon success or an error message if no editor is open.
+   */
   encode(): void {
-    const activeTextEditor = this.window.activeTextEditor;
+    const activeTextEditor = this.editorWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
-      console.log("No open editor");
+      this.editorWindow.showErrorMessage("No open editor");
       return;
     }
 
-    activeTextEditor.edit(function (editBuilder: any) {
+    activeTextEditor.edit((editBuilder: any) => {
       for (const selection of activeTextEditor.selections) {
         let textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, btoa(textSelected));
+        editBuilder.replace(selection, Buffer.from(textSelected, 'utf-8').toString('base64'));
       }
     });
 
-    this.window.showInformationMessage("Base 64 encode");
+    this.editorWindow.showInformationMessage("Selection encoded to Base64");
   }
 
+  /**
+   * Decodes the currently selected Base64-encoded text(s) in the active editor.
+   * Shows an information message upon success or an error message if no editor is open or decoding fails.
+   */
   decode(): void {
-    const activeTextEditor = this.window.activeTextEditor;
+    const activeTextEditor = this.editorWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
       console.log("No open editor");
+      this.editorWindow.showErrorMessage("No open editor");
       return;
     }
 
-    activeTextEditor.edit(function (editBuilder: any) {
+    activeTextEditor.edit((editBuilder: any) => {
       for (const selection of activeTextEditor.selections) {
         let textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, atob(textSelected));
+        editBuilder.replace(selection, Buffer.from(textSelected, 'base64').toString('utf-8'));
       }
     });
 
-    this.window.showInformationMessage("Base 64 decode");
+    this.editorWindow.showInformationMessage("Selection decoded from Base64");
   }
 }
