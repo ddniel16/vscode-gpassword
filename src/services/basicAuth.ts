@@ -1,17 +1,21 @@
 import bcrypt from "bcrypt";
 
 export class BasicAuth {
-  window: any;
+  editorWindow: any;
 
-  constructor(window: any) {
-    this.window = window;
+  constructor(editorWindow: any) {
+    this.editorWindow = editorWindow;
   }
 
-  passwordToBasicAuth(): void {
-    const activeTextEditor = this.window.activeTextEditor;
+  /**
+   * Converts the currently selected text(s) in the active editor to Basic Auth format.
+   * Uses bcrypt to hash the selected text and replaces it in the editor.
+   * Shows an information message upon success or an error message if no editor is open.
+   */
+  passwordToHash(): void {
+    const activeTextEditor = this.editorWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
-      console.log("No open editor");
+      this.editorWindow.showErrorMessage("No open editor");
       return;
     }
 
@@ -22,6 +26,6 @@ export class BasicAuth {
       }
     });
 
-    this.window.showInformationMessage("Password to Basic Auth");
+    this.editorWindow.showInformationMessage("Password to Basic Auth");
   }
 }

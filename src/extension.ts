@@ -25,7 +25,7 @@ export function activate(context: ExtensionContext) {
   });
 
   let passwordToBasicAuth = commands.registerCommand("gpassword.passwordToBasicAuth", () => {
-    new BasicAuth(window).passwordToBasicAuth();
+    new BasicAuth(window).passwordToHash();
   });
 
   let baseEncode = commands.registerCommand("gpassword.BaseEncode", () => {
