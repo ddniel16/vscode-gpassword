@@ -1,84 +1,81 @@
 {
-  "name": "gpassword",
-  "displayName": "Generator password & Encoder Tools",
-  "description": "Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.",
-  "publisher": "ddniel16",
-  "icon": "imgs/icon.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ddniel16/vscode-gpassword"
-  },
-  "version": "0.0.3",
-  "engines": {
-    "vscode": "^1.85.0"
-  },
+  "activationEvents": [],
   "categories": [
     "Other"
   ],
-  "keywords": [
-    "security",
-    "password",
-    "bcrypt",
-    "base64",
-    "basic auth",
-    "jwt decode",
-    "WordPress Salt"
-  ],
-  "activationEvents": [],
-  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
+        "category": "gPassword",
         "command": "gpassword.Letters",
-        "title": "Letters only",
-        "category": "gPassword"
+        "title": "Letters only"
       },
       {
+        "category": "gPassword",
         "command": "gpassword.LettersNumbers",
-        "title": "Letters and numbers",
-        "category": "gPassword"
+        "title": "Letters and numbers"
       },
       {
+        "category": "gPassword",
         "command": "gpassword.AllCharacters",
-        "title": "Letters, Numbers & Symbols",
-        "category": "gPassword"
+        "title": "Letters, Numbers & Symbols"
       },
       {
+        "category": "gPassword",
         "command": "gpassword.passwordToBasicAuth",
-        "title": "Replace password to hash of Basic Auth (bcrypt.hashSync)",
-        "category": "gPassword"
+        "title": "Replace password to hash of Basic Auth (bcrypt.hashSync)"
       },
       {
+        "category": "gPassword",
         "command": "gpassword.BaseEncode",
-        "title": "Base64 Encode",
-        "category": "gPassword"
+        "title": "Base64 Encode"
       },
       {
+        "category": "gPassword",
         "command": "gpassword.BaseDecode",
-        "title": "Base64 Decode",
-        "category": "gPassword"
+        "title": "Base64 Decode"
       },
       {
+        "category": "gPassword",
         "command": "gpassword.WordPressSaltYml",
-        "title": "WordPress Salt YML",
-        "category": "gPassword"
+        "title": "WordPress Salt YML"
       },
       {
+        "category": "gPassword",
         "command": "gpassword.WordPressSaltEnv",
-        "title": "WordPress Salt ENV",
-        "category": "gPassword"
-      },{
+        "title": "WordPress Salt ENV"
+      },
+      {
+        "category": "gPassword",
         "command": "gpassword.JWT",
-        "title": "JWT Decode",
-        "category": "gPassword"
+        "title": "JWT Decode"
       }
     ],
+    "configuration": {
+      "properties": {
+        "gpassword.randomLengthMax": {
+          "default": 25,
+          "description": "Maximum characters",
+          "maximum": 55,
+          "minimum": 16,
+          "type": "integer"
+        },
+        "gpassword.randomLengthMin": {
+          "default": 20,
+          "description": "Minimum characters",
+          "maximum": 54,
+          "minimum": 15,
+          "type": "integer"
+        }
+      },
+      "title": "gPassword"
+    },
     "menus": {
       "editor/context": [
         {
+          "group": "gpassword",
           "submenu": "gpassword.submenu",
-          "when": "editorTextFocus && !editorReadonly",
-          "group": "gpassword"
+          "when": "editorTextFocus && !editorReadonly"
         }
       ],
       "gpassword.submenu": [
@@ -119,48 +116,55 @@
         "id": "gpassword.submenu",
         "label": "gPassword"
       }
-    ],
-    "configuration": {
-      "title": "gPassword",
-      "properties": {
-        "gpassword.randomLengthMin": {
-          "type": "integer",
-          "default": 20,
-          "description": "Minimum characters",
-          "minimum": 15,
-          "maximum": 54
-        },
-        "gpassword.randomLengthMax": {
-          "type": "integer",
-          "default": 25,
-          "description": "Maximum characters",
-          "minimum": 16,
-          "maximum": 55
-        }
-      }
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "18.x",
-    "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
-    "@vscode/test-cli": "^0.0.4",
-    "@vscode/test-electron": "^2.3.8",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3"
+    ]
   },
   "dependencies": {
-    "bcrypt": "^5.1.1"
-  }
+    "bcrypt": "^6.0.0"
+  },
+  "description": "Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.",
+  "devDependencies": {
+    "@types/assert": "^1.5.11",
+    "@types/bcrypt": "^5.0.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.0.4",
+    "@types/sinon": "^17.0.4",
+    "@types/vscode": "^1.101.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.29.0",
+    "sinon": "^21.0.0",
+    "typescript": "^5.8.3"
+  },
+  "displayName": "Generator password & Encoder Tools",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "icon": "imgs/icon.png",
+  "keywords": [
+    "security",
+    "password",
+    "bcrypt",
+    "base64",
+    "basic auth",
+    "jwt decode",
+    "WordPress Salt"
+  ],
+  "main": "./out/extension.js",
+  "name": "gpassword",
+  "publisher": "ddniel16",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ddniel16/vscode-gpassword"
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "pretest": "npm run compile && npm run lint",
+    "test": "vscode-test",
+    "vscode:prepublish": "npm run compile",
+    "watch": "tsc -watch -p ./"
+  },
+  "version": "0.0.4"
 }
