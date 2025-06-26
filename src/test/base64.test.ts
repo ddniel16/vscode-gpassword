@@ -3,9 +3,15 @@ import * as sinon from 'sinon';
 import { Base64 } from '../services/base64';
 
 suite('Base64', () => {
-  let editorWindowMock: any;
+  let editorWindowMock: Record<string, unknown>;
   let base64: Base64;
-  let activeTextEditorMock: any;
+  let activeTextEditorMock: {
+    selections: Array<{ start: number; end: number }>;
+    document: {
+      getText: sinon.SinonStub;
+    };
+    edit: (callback: (editBuilder: { replace: sinon.SinonSpy }) => void) => Promise<boolean>;
+  };
   let editBuilderReplaceSpy: sinon.SinonSpy;
   let showInfoMessageSpy: sinon.SinonSpy;
   let showErrorMessageSpy: sinon.SinonSpy;
@@ -16,11 +22,11 @@ suite('Base64', () => {
     showErrorMessageSpy = sinon.spy();
 
     activeTextEditorMock = {
-      selections: [{}, {}],
+      selections: [{ start: 0, end: 0 }],
       document: {
         getText: sinon.stub()
       },
-      edit: (callback: any) => {
+      edit: (callback: (editBuilder: { replace: sinon.SinonSpy }) => void) => {
         callback({ replace: editBuilderReplaceSpy });
         return Promise.resolve(true);
       }
