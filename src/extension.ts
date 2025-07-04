@@ -3,79 +3,71 @@ import { workspace, window, commands, type ExtensionContext } from "vscode";
 import { Base64 } from "./services/base64";
 import { BasicAuth } from "./services/basicAuth";
 import { Passwords } from "./services/passwords";
-import { type ExtensionConfig } from "./extensionConfig";
+import { ExtensionConfig } from "./extensionConfig";
 import { WordPressSalts } from "./services/wordPressSalts";
 import { JWT } from "./services/jwt";
 import { Strapi } from "./services/strapi";
 
-export let $extConfig: ExtensionConfig;
+export const extConfig: ExtensionConfig = {} as ExtensionConfig;
 
 export function activate(context: ExtensionContext) {
-  $extConfig = workspace.getConfiguration().get("gpassword")!;
+  const config = workspace.getConfiguration().get("gpassword");
+  if (config) {
+    Object.assign(extConfig, config);
+  }
 
-  let letters = commands.registerCommand("gpassword.Letters", () => {
-    new Passwords(window, $extConfig).lettersGenerate();
-  });
+  const commandDefinitions: Array<{
+    command: string;
+    callback: () => void;
+  }> = [
+    {
+      command: "gpassword.Letters",
+      callback: () => new Passwords(window, extConfig).lettersGenerate(),
+    },
+    {
+      command: "gpassword.LettersNumbers",
+      callback: () => new Passwords(window, extConfig).lettersNumbersGenerate(),
+    },
+    {
+      command: "gpassword.AllCharacters",
+      callback: () => new Passwords(window, extConfig).allCharactersGenerate(),
+    },
+    {
+      command: "gpassword.passwordToBasicAuth",
+      callback: () => new BasicAuth(window).passwordToHash(),
+    },
+    {
+      command: "gpassword.BaseEncode",
+      callback: () => new Base64(window).encode(),
+    },
+    {
+      command: "gpassword.BaseDecode",
+      callback: () => new Base64(window).decode(),
+    },
+    {
+      command: "gpassword.WordPressSaltYml",
+      callback: () => new WordPressSalts(window).generateYml(),
+    },
+    {
+      command: "gpassword.WordPressSaltEnv",
+      callback: () => new WordPressSalts(window).generateEnv(),
+    },
+    {
+      command: "gpassword.StrapiYml",
+      callback: () => new Strapi(window).generateYml(),
+    },
+    {
+      command: "gpassword.StrapiEnv",
+      callback: () => new Strapi(window).generateEnv(),
+    },
+    {
+      command: "gpassword.JWT",
+      callback: () => new JWT(window).decode(),
+    },
+  ];
 
-  let lettersNumbers = commands.registerCommand("gpassword.LettersNumbers", () => {
-    new Passwords(window, $extConfig).lettersNumbersGenerate();
-  });
-
-  let allCharacters = commands.registerCommand("gpassword.AllCharacters", () => {
-    new Passwords(window, $extConfig).allCharactersGenerate();
-  });
-
-  let passwordToBasicAuth = commands.registerCommand("gpassword.passwordToBasicAuth", () => {
-    new BasicAuth(window).passwordToHash();
-  });
-
-  let baseEncode = commands.registerCommand("gpassword.BaseEncode", () => {
-    new Base64(window).encode();
-  });
-
-  let baseDecode = commands.registerCommand("gpassword.BaseDecode", () => {
-    new Base64(window).decode();
-  });
-
-  let wordPressSaltYml = commands.registerCommand("gpassword.WordPressSaltYml", () => {
-    new WordPressSalts(window).generateYml();
-  });
-
-  let wordPressSaltEnv = commands.registerCommand("gpassword.WordPressSaltEnv", () => {
-    new WordPressSalts(window).generateEnv();
-  });
-
-  let strapiYml = commands.registerCommand("gpassword.StrapiYml", () => {
-    new Strapi(window).generateYml();
-  });
-
-  let strapiEnv = commands.registerCommand("gpassword.StrapiEnv", () => {
-    new Strapi(window).generateEnv();
-  });
-
-  let jwt = commands.registerCommand("gpassword.JWT", () => {
-    new JWT(window).decode();
-  });
-
-  context.subscriptions.push(letters);
-  context.subscriptions.push(lettersNumbers);
-  context.subscriptions.push(allCharacters);
-
-  context.subscriptions.push(passwordToBasicAuth);
-
-  context.subscriptions.push(baseEncode);
-  context.subscriptions.push(baseDecode);
-
-  context.subscriptions.push(wordPressSaltYml);
-  context.subscriptions.push(wordPressSaltEnv);
-
-  context.subscriptions.push(strapiYml);
-  context.subscriptions.push(strapiEnv);
-
-  context.subscriptions.push(jwt);
-}
-
-// This method is called when your extension is deactivated
-export function deactivate() {
-  console.log("Deactivate extension");
+  for (const def of commandDefinitions) {
+    const subscribe = commands.registerCommand(def.command, def.callback);
+    context.subscriptions.push(subscribe);
+  }
 }
