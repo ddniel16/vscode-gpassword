@@ -6,6 +6,7 @@ import { Passwords } from "./services/passwords";
 import { type ExtensionConfig } from "./extensionConfig";
 import { WordPressSalts } from "./services/wordPressSalts";
 import { JWT } from "./services/jwt";
+import { Strapi } from "./services/strapi";
 
 export let $extConfig: ExtensionConfig;
 
@@ -44,6 +45,14 @@ export function activate(context: ExtensionContext) {
     new WordPressSalts(window).generateEnv();
   });
 
+  let strapiYml = commands.registerCommand("gpassword.StrapiYml", () => {
+    new Strapi(window).generateYml();
+  });
+
+  let strapiEnv = commands.registerCommand("gpassword.StrapiEnv", () => {
+    new Strapi(window).generateEnv();
+  });
+
   let jwt = commands.registerCommand("gpassword.JWT", () => {
     new JWT(window).decode();
   });
@@ -59,6 +68,9 @@ export function activate(context: ExtensionContext) {
 
   context.subscriptions.push(wordPressSaltYml);
   context.subscriptions.push(wordPressSaltEnv);
+
+  context.subscriptions.push(strapiYml);
+  context.subscriptions.push(strapiEnv);
 
   context.subscriptions.push(jwt);
 }

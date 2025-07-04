@@ -47,6 +47,16 @@
       },
       {
         "category": "gPassword",
+        "command": "gpassword.StrapiYml",
+        "title": "Strapi Tokens YML"
+      },
+      {
+        "category": "gPassword",
+        "command": "gpassword.StrapiEnv",
+        "title": "Strapi Tokens ENV"
+      },
+      {
+        "category": "gPassword",
         "command": "gpassword.JWT",
         "title": "JWT Decode"
       }
