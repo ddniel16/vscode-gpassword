@@ -23,12 +23,15 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install dependencies
-        run: npm ci --omit=dev --no-audit --no-fund
-
       - name: Extract tag version
         id: get_version
         run: echo "TAG_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build the extension
+        run: npm install --global @vscode/vsce@latest && vsce package --out gpassword.vsix
 
       - name: Set npm version
         run: npm version $TAG_VERSION --no-git-tag-version
@@ -67,5 +70,5 @@ jobs:
         uses: HaaLeo/publish-vscode-extension@v2
         with:
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          extensionFile: ${{ needs.build-lint-test.outputs.vsixPath }}
           registryUrl: https://marketplace.visualstudio.com
+          extensionFile: gpassword.vsix
