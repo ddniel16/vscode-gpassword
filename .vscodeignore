@@ -3,8 +3,6 @@
 .vscode-test/**
 .github/**
 .git/
-imgs/**
-
 # Archivos de configuración y documentación
 .gitignore
 .editorconfig
