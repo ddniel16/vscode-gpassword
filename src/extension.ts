@@ -16,58 +16,54 @@ export function activate(context: ExtensionContext) {
     Object.assign(extConfig, config);
   }
 
-  const commandDefinitions: Array<{
-    command: string;
-    callback: () => void;
-  }> = [
-    {
-      command: "gpassword.Letters",
-      callback: () => new Passwords(window, extConfig).lettersGenerate(),
-    },
-    {
-      command: "gpassword.LettersNumbers",
-      callback: () => new Passwords(window, extConfig).lettersNumbersGenerate(),
-    },
-    {
-      command: "gpassword.AllCharacters",
-      callback: () => new Passwords(window, extConfig).allCharactersGenerate(),
-    },
-    {
-      command: "gpassword.passwordToBasicAuth",
-      callback: () => new BasicAuth(window).passwordToHash(),
-    },
-    {
-      command: "gpassword.BaseEncode",
-      callback: () => new Base64(window).encode(),
-    },
-    {
-      command: "gpassword.BaseDecode",
-      callback: () => new Base64(window).decode(),
-    },
-    {
-      command: "gpassword.WordPressSaltYml",
-      callback: () => new WordPressSalts(window).generateYml(),
-    },
-    {
-      command: "gpassword.WordPressSaltEnv",
-      callback: () => new WordPressSalts(window).generateEnv(),
-    },
-    {
-      command: "gpassword.StrapiYml",
-      callback: () => new Strapi(window).generateYml(),
-    },
-    {
-      command: "gpassword.StrapiEnv",
-      callback: () => new Strapi(window).generateEnv(),
-    },
-    {
-      command: "gpassword.JWT",
-      callback: () => new JWT(window).decode(),
-    },
-  ];
+  // * Register commands
 
-  for (const def of commandDefinitions) {
-    const subscribe = commands.registerCommand(def.command, def.callback);
-    context.subscriptions.push(subscribe);
-  }
+  // Generate Passwords
+  context.subscriptions.push(commands.registerCommand("gpassword.Letters", () => {
+    new Passwords(window, extConfig).lettersGenerate();
+  }));
+
+  context.subscriptions.push(commands.registerCommand("gpassword.LettersNumbers", () => {
+    new Passwords(window, extConfig).lettersNumbersGenerate();
+  }));
+
+  context.subscriptions.push(commands.registerCommand("gpassword.AllCharacters", () => {
+    new Passwords(window, extConfig).allCharactersGenerate();
+  }));
+
+  // Generate Base64
+  context.subscriptions.push(commands.registerCommand("gpassword.BaseEncode", () => {
+    new Base64(window).encode();
+  }));
+  context.subscriptions.push(commands.registerCommand("gpassword.BaseDecode", () => {
+    new Base64(window).decode();
+  }));
+
+  // Generate Basic Auth hash
+  context.subscriptions.push(commands.registerCommand("gpassword.passwordToBasicAuth", () => {
+    new BasicAuth(window).passwordToHash();
+  }));
+
+  // Generate JWT Tokens
+  context.subscriptions.push(commands.registerCommand("gpassword.JWT", () => {
+    new JWT(window).decode();
+  }));
+
+  // Generate Strapi Tokens
+  context.subscriptions.push(commands.registerCommand("gpassword.StrapiYml", () => {
+    new Strapi(window).generateYml();
+  }));
+
+  context.subscriptions.push(commands.registerCommand("gpassword.StrapiEnv", () => {
+    new Strapi(window).generateEnv();
+  }));
+
+  // Generate WordPress Tokens
+  context.subscriptions.push(commands.registerCommand("gpassword.WordPressSaltYml", () => {
+    new WordPressSalts(window).generateYml();
+  }));
+
+  context.subscriptions.push(commands.registerCommand("gpassword.WordPressSaltEnv", () => {
+    new WordPressSalts(window).generateEnv();
+  }));
 }

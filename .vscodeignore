@@ -7,8 +7,6 @@
 .gitignore
 .editorconfig
 eslint.config.mjs
-vsc-extension-quickstart.md
-ROADMAP.md
 
 # Archivos de configuración de TypeScript y ESLint
 **/tsconfig.json
@@ -20,7 +18,4 @@ src/**
 **/*.map
 
 # Otros archivos de pruebas
-**/.vscode-test.*
-
-# Node modules (por si acaso)
-node_modules/
+**/*.test.*
