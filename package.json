@@ -109,6 +109,11 @@
           "when": "editorTextFocus && !editorReadonly && editorHasSelection"
         },
         {
+          "command": "gpassword.JWT",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && editorHasSelection"
+        },
+        {
           "command": "gpassword.AllCharacters",
           "group": "gpassword",
           "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
@@ -120,6 +125,26 @@
         },
         {
           "command": "gpassword.Letters",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
+        },
+        {
+          "command": "gpassword.WordPressSaltYml",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
+        },
+        {
+          "command": "gpassword.WordPressSaltEnv",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
+        },
+        {
+          "command": "gpassword.StrapiYml",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
+        },
+        {
+          "command": "gpassword.StrapiEnv",
           "group": "gpassword",
           "when": "editorTextFocus && !editorReadonly && !editorHasSelection"
         }
