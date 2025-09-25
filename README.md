@@ -2,11 +2,25 @@
 
 [![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/i/ddniel16.gpassword.svg)](https://marketplace.visualstudio.com/items?itemName=ddniel16.gpassword)
 
+## Instalación
+
+Con Visual Studio Code abierto, lanza la búsqueda rápida (Ctrl+P), pega el siguiente comando y presiona enter.
+
+> ext install ddniel16.gpassword
+
+Alternativamente, instala manualmente el VSIX desde la [última versión](https://github.com/ddniel16/vscode-gPassword/releases/latest) y luego instálalo desde el menú de extensiones (Ctrl+Shift+X) - (tres puntos en la esquina superior derecha) > "Instalar desde VSIX...".
+
+o con desde la terminal:
+
+```bash
+code --install-extension <path-to-file>.vsix
+```
+
 ## ¿Qué es gPassword & Encoder Tools?
 
 **gPassword & Encoder Tools** es una extensión "**vsix**" que te ayuda a generar contraseñas seguras y realizar tareas comunes de codificación y decodificación, todo desde tu editor.
 
-Esta extensión combina varias herramientas útiles para desarrolladores, como la generación de contraseñas, codificación y decodificación Base64, decodificación JWT y más, todo en un solo lugar. Con comandos accesibles y acceso desde el submenú, puedes mejorar tu flujo de trabajo y añadir seguridad a tus proyectos, sin salir de tu editor.
+Esta extensión combina varias herramientas útiles para desarrolladores, como la generación de contraseñas, codificación y decodificación Base64, decodificación JWT y más, todo en un solo lugar. Con comandos accesibles y acceso desde el submenu, puedes mejorar tu flujo de trabajo y añadir seguridad a tus proyectos, sin salir de tu editor.
 
 ## ¿Qué puedes hacer con esta extensión?
 

@@ -4,6 +4,9 @@
     "name": "ddniel16",
     "url": "https://github.com/ddniel16"
   },
+  "bugs": {
+    "url": "https://github.com/ddniel16/vscode-gpassword/issues"
+  },
   "categories": [
     "Other"
   ],
@@ -180,6 +183,11 @@
   "engines": {
     "vscode": "^1.101.0"
   },
+  "galleryBanner": {
+    "color": "#0C4A6E",
+    "theme": "dark"
+  },
+  "homepage": "https://github.com/ddniel16/vscode-gpassword#readme",
   "icon": "imgs/icon.png",
   "keywords": [
     "security",
