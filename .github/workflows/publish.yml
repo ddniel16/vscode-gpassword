@@ -9,66 +9,88 @@ on:
       - "*.*.*"
 
 jobs:
-  publish:
-    if: github.event.base_ref == 'refs/heads/main' || github.event.ref == 'refs/heads/main'
+  package:
+    if: github.event.base_ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    name: Package and Publish Extension
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necesario para obtener todos los tags y commits
+          # Necesario para obtener todos los tags y commits
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-
-      - name: Extract tag version
-        id: get_version
-        run: echo "TAG_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          node-version-file: .nvmrc
 
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --global @vscode/vsce@latest
 
-      - name: Build the extension
-        run: npm install --global @vscode/vsce@latest && vsce package --out gpassword.vsix
+      - name: Set package version
+        run: npm version ${{ github.ref_name }} --no-git-tag-version
 
-      - name: Set npm version
-        run: npm version $TAG_VERSION --no-git-tag-version
+      - name: Package the extension
+        run: vsce package
+
+      - name: Find VSIX file
+        id: find_vsix
+        run: |
+          set -euo pipefail
+          FILE=$(ls *.vsix | head -n 1 || true)
+          if [ -z "$FILE" ]; then
+            echo "VSIX file not found" >&2
+            exit 1
+          fi
+          echo "VSIX_FILE=$FILE" >> $GITHUB_ENV
+          echo "Found: $FILE"
 
       - name: Commit and push version change
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json
-          git commit -m "chore: bump version to $TAG_VERSION [skip ci]" || echo "No changes to commit"
+          git commit -m "chore: bump version to ${{ github.ref_name }} [skip ci]"
           git push origin HEAD:main
-
-      - name: Get previous tag
-        id: prev_tag
-        run: |
-          PREV_TAG=$(git tag --sort=-creatordate | grep -v ${{ github.ref_name }} | head -n 1)
-          echo "PREV_TAG=$PREV_TAG" >> $GITHUB_ENV
 
       - name: Generate changelog
         id: changelog
         run: |
-          git log $PREV_TAG..${{ github.ref_name }} --pretty=format:"* %s (%an)" > changelog.txt
+          set -euo pipefail
+          PREV_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | grep -v "^${{ github.ref_name }}$" | head -n 1)
+          git log $PREV_TAG..${{ github.ref_name }} --pretty=format:"* %s (%an)" --no-merges --author='^(?!github-actions\[bot\]$).*' > changelog.txt
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          body_path: changelog.txt
-          files: ${{ needs.build-lint-test.outputs.vsixPath }}
+      - name: Create draft release (GH CLI)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TITLE="Release ${{ github.ref_name }}"
+          NOTES_FILE="changelog.txt"
+          echo "Processing release for tag: ${{ github.ref_name }}"
+          if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
+            echo "Release already exists. Updating notes as draft..."
+            gh release edit "${{ github.ref_name }}" --title "$TITLE" --notes-file "$NOTES_FILE" --draft=true
+          else
+            echo "Creating draft release..."
+            gh release create "${{ github.ref_name }}" --title "$TITLE" --notes-file "$NOTES_FILE" --draft
+          fi
 
-      - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v2
-        with:
-          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
-          extensionFile: gpassword.vsix
+      - name: Upload VSIX asset (GH CLI)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "Uploading asset $VSIX_FILE to release ${{ github.ref_name }}"
+          gh release upload "${{ github.ref_name }}" "$VSIX_FILE" --clobber
+
+      - name: Publish release (remove draft)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "Publishing release ${{ github.ref_name }}"
+          gh release edit "${{ github.ref_name }}" --draft=false
