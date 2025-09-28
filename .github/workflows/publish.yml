@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci --no-audit --no-fund
-          npm install --global @vscode/vsce@latest
+          npm install --global @vscode/vsce@latest ovsx@latest
 
       - name: Set package version
         run: npm version ${{ github.ref_name }} --no-git-tag-version
@@ -94,3 +94,29 @@ jobs:
           set -euo pipefail
           echo "Publishing release ${{ github.ref_name }}"
           gh release edit "${{ github.ref_name }}" --draft=false
+
+      - name: Publish to VS Code Marketplace
+        if: success()
+        env:
+          VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${VSCE_PAT}" ]; then
+            echo "VSCE_PAT (VS_MARKETPLACE_TOKEN) no configurado. Saltando publicación Marketplace." >&2
+            exit 0
+          fi
+          echo "Publicando en VS Code Marketplace..."
+          npx vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
+
+      - name: Publish to Open VSX
+        if: success()
+        env:
+          OVSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${OVSX_TOKEN}" ]; then
+            echo "OVSX_TOKEN no configurado. Saltando publicación Open VSX." >&2
+            exit 0
+          fi
+          echo "Publicando en Open VSX..."
+          npx ovsx publish "$VSIX_FILE" --pat "$OVSX_TOKEN" --verbose
