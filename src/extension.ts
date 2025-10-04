@@ -1,12 +1,17 @@
 import { workspace, window, commands, type ExtensionContext } from "vscode";
 
-import { Base64 } from "./services/base64";
-import { BasicAuth } from "./services/basicAuth";
-import { Passwords } from "./services/passwords";
+// Import Commands
+import { Base64 } from "./commands/base64";
+import { BasicAuth } from "./commands/basicAuth";
+import { Passwords } from "./commands/passwords";
 import { ExtensionConfig } from "./extensionConfig";
-import { WordPressSalts } from "./services/wordPressSalts";
-import { JWT } from "./services/jwt";
-import { Strapi } from "./services/strapi";
+import { WordPressSalts } from "./commands/wordPressSalts";
+import { JWT } from "./commands/jwt";
+import { Strapi } from "./commands/strapi";
+
+// Import views
+import { PasswordGeneratorViewProvider } from "./views/password";
+import { JWTViewProvider } from "./views/jwt";
 
 export const extConfig: ExtensionConfig = {} as ExtensionConfig;
 
@@ -66,4 +71,8 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(commands.registerCommand("gpassword.WordPressSaltEnv", () => {
     new WordPressSalts(window).generateEnv();
   }));
+
+  // * Register views
+  context.subscriptions.push(window.registerWebviewViewProvider("passwordGenerator.password", new PasswordGeneratorViewProvider(context)));
+  context.subscriptions.push(window.registerWebviewViewProvider("passwordGenerator.jwt", new JWTViewProvider(context)));
 }

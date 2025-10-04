@@ -68,24 +68,78 @@
         "title": "JWT Decode"
       }
     ],
-    "configuration": {
-      "properties": {
-        "gpassword.randomLengthMax": {
-          "default": 25,
-          "description": "Maximum characters",
-          "maximum": 55,
-          "minimum": 16,
-          "type": "integer"
-        },
-        "gpassword.randomLengthMin": {
-          "default": 20,
-          "description": "Minimum characters",
-          "maximum": 54,
-          "minimum": 15,
-          "type": "integer"
+    "configuration": [
+      {
+        "title": "gPassword: General",
+        "order": 1,
+        "properties": {
+          "gpassword.randomLengthMax": {
+            "default": 25,
+            "description": "Maximum characters for random password (Command & Submenu)",
+            "maximum": 55,
+            "minimum": 16,
+            "type": "integer"
+          },
+          "gpassword.randomLengthMin": {
+            "default": 20,
+            "description": "Minimum characters for random password (Command & Submenu)",
+            "maximum": 54,
+            "minimum": 15,
+            "type": "integer"
+          }
         }
       },
-      "title": "gPassword"
+      {
+        "title": "gPassword: Password Generator (Sidebar)",
+        "order": 2,
+        "properties": {
+          "gpassword.passwordGeneratorLength": {
+            "default": 20,
+            "description": "Default length for password generator",
+            "maximum": 55,
+            "minimum": 10,
+            "type": "integer"
+          },
+          "gpassword.passwordGeneratorDefault.includeNumbers": {
+            "default": true,
+            "description": "Include numbers in password",
+            "type": "boolean"
+          },
+          "gpassword.passwordGeneratorDefault.includeSymbols": {
+            "default": true,
+            "description": "Include symbols in password",
+            "type": "boolean"
+          },
+          "gpassword.passwordGeneratorDefault.includeUppercase": {
+            "default": true,
+            "description": "Include uppercase letters in password",
+            "type": "boolean"
+          }
+        }
+      }
+    ],
+    "views": {
+      "passwordGenerator": [
+        {
+            "id": "passwordGenerator.password",
+            "name": "Password Generator",
+            "type": "webview"
+        },
+        {
+            "id": "passwordGenerator.jwt",
+            "name": "JWT Decoder & Validator",
+            "type": "webview"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "icon": "src/svg/lock.svg",
+          "id": "passwordGenerator",
+          "title": "gPassword & Encoder Tools"
+        }
+      ]
     },
     "menus": {
       "editor/context": [
