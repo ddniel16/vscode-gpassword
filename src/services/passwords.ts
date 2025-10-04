@@ -1,110 +1,32 @@
-import { type ExtensionConfig } from "../extensionConfig";
+interface PasswordOptions {
+  numbers: boolean;
+  symbols: boolean;
+  uppercase: boolean;
+  customChars: string;
+  length: number;
+}
 
-export class Passwords {
-  randomLengthMin: number;
-  randomLengthMax: number;
-  window: any;
+export class PasswordsGenerator {
+  generatePassword(options: PasswordOptions): string {
+    const { numbers, symbols, uppercase, customChars, length } = options;
 
-  constructor(window: any, $extConfig: ExtensionConfig) {
-    this.randomLengthMin = $extConfig.randomLengthMin;
-    this.randomLengthMax = $extConfig.randomLengthMax;
-    this.window = window;
+    const numChars = '0123456789';
+    const symbolChars = "/\"'`!¡~@#$%^&*()_+-=[]{}|;:,.<>¿?€";
+    const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
 
-    if (this.randomLengthMin >= this.randomLengthMax) {
-      throw new Error('The "Random Length Min" parameter is greater than the "Random Length Max"!');
-    }
-  }
+    let chars = lowerChars;
 
-  lettersGenerate(): void {
-    const activeTextEditor = this.window.activeTextEditor;
-    if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
-      console.log("No open editor");
-      return;
-    }
+    if (numbers) chars += numChars;
+    if (symbols) chars += symbolChars;
+    if (uppercase) chars += upperChars;
+    if (customChars && typeof customChars === 'string') chars += customChars;
 
-    let password = this.passwordGenerator("letters");
+    const lengthChars = typeof length === 'number' && length >= 10 ? length : 10;
 
-    const selection = activeTextEditor.selection;
-    activeTextEditor.edit(function (editBuilder: any) {
-      editBuilder.insert(selection.anchor, password);
-    });
-
-    this.window.showInformationMessage("Password generated");
-  }
-
-  lettersNumbersGenerate(): void {
-    const activeTextEditor = this.window.activeTextEditor;
-    if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
-      console.log("No open editor");
-      return;
-    }
-
-    let password = this.passwordGenerator("letters-numbers");
-
-    const selection = activeTextEditor.selection;
-    activeTextEditor.edit(function (editBuilder: any) {
-      editBuilder.insert(selection.anchor, password);
-    });
-
-    this.window.showInformationMessage("Password generated");
-  }
-
-  allCharactersGenerate(): void {
-    const activeTextEditor = this.window.activeTextEditor;
-    if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
-      console.log("No open editor");
-      return;
-    }
-
-    let password = this.passwordGenerator("all-generate");
-
-    const selection = activeTextEditor.selection;
-    activeTextEditor.edit(function (editBuilder: any) {
-      editBuilder.insert(selection.anchor, password);
-    });
-
-    this.window.showInformationMessage("Password generated");
-  }
-
-  randomNumber(): number {
-    const min = Math.ceil(this.randomLengthMin);
-    const max = Math.floor(this.randomLengthMax);
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
-
-  passwordGenerator(typeGenerate: string): string {
-    const passwordLength = this.randomNumber();
-
-    const letters = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ";
-    const symbols = "[]{}()¿?-_.:,;><|/¡!^*+=@#$%&";
-    const numeric = "1234567890";
-
-    let characters = "";
-    switch (typeGenerate) {
-    case "letters":
-      characters = letters;
-      break;
-    case "letters-numbers":
-      characters = letters + numeric;
-      break;
-    case "all-generate":
-      characters = letters + numeric + symbols;
-      break;
-    }
-
-    const charLength = characters.length;
-
-    let password = "";
-    let index = 0;
-    while (index < passwordLength) {
-      let charIndex = Math.floor(
-        Math.floor(Math.random() * charLength)
-      );
-      password += characters.charAt(charIndex);
-      ++index;
+    let password = '';
+    for (let i = 0; i < lengthChars; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
     return password;
