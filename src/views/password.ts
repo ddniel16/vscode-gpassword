@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 
 import { PasswordsGenerator } from "../services/passwords";
+import { EntropyCalculator } from "../services/entropy";
 
 export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider {
 
@@ -14,34 +15,33 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
 
     webviewView.webview.onDidReceiveMessage(async msg => {
       const { type, payload } = msg;
+
       switch (type) {
-        case 'listGenerate': {
-            const passwordGenerator = new PasswordsGenerator();
+      case 'listGenerate': {
+        const passwordGenerator = new PasswordsGenerator();
+        const entropyCalculator = new EntropyCalculator();
 
-            const listGenerate = [
-              { id: 'result-a', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-b', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-c', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-d', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-e', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-f', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-g', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-h', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-i', value: passwordGenerator.generatePassword(payload) },
-              { id: 'result-j', value: passwordGenerator.generatePassword(payload) },
-            ];
+        const listItems = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+        let listGenerate: { id: string; value: string, entropy: { theoreticalBits: number, shannonBits: number, score: string } }[] = [];
 
-            webviewView.webview.postMessage({ type: 'listGenerateMessage', payload: listGenerate });
-            break;
-        }
-        case 'copy': {
-          if (payload) {
-            await vscode.env.clipboard.writeText(payload);
-            vscode.window.showInformationMessage('Password copied to clipboard');
-          }
-          break;
-        }
+        listItems.forEach((item, index) => {
+          const pwd = passwordGenerator.generatePassword(payload);
+          const entropy = entropyCalculator.calculateDetailedEntropy(pwd, payload);
+          listGenerate.push({ "id": item, "value": pwd, "entropy": entropy });
+        });
+
+        webviewView.webview.postMessage({ type: 'listGenerateMessage', payload: listGenerate });
+        break;
       }
+      case 'copy': {
+        if (payload) {
+          await vscode.env.clipboard.writeText(payload);
+          vscode.window.showInformationMessage('Password copied to clipboard');
+        }
+        break;
+      }
+      }
+
     });
 
     const cfg = vscode.workspace.getConfiguration("gpassword");
@@ -115,16 +115,26 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
 <button id="regenerate" title="Generate">Regenerate list</button>
 
 <div class="listItems">
-  <button id="copy-a" title="Copy">Copy</button> <code id="result-a"></code> <br />
-  <button id="copy-b" title="Copy">Copy</button> <code id="result-b"></code> <br />
-  <button id="copy-c" title="Copy">Copy</button> <code id="result-c"></code> <br />
-  <button id="copy-d" title="Copy">Copy</button> <code id="result-d"></code> <br />
-  <button id="copy-e" title="Copy">Copy</button> <code id="result-e"></code> <br />
-  <button id="copy-f" title="Copy">Copy</button> <code id="result-f"></code> <br />
-  <button id="copy-g" title="Copy">Copy</button> <code id="result-g"></code> <br />
-  <button id="copy-h" title="Copy">Copy</button> <code id="result-h"></code> <br />
-  <button id="copy-i" title="Copy">Copy</button> <code id="result-i"></code> <br />
-  <button id="copy-j" title="Copy">Copy</button> <code id="result-j"></code> <br />
+  <button id="copy-a" title="Copy">Copy</button> <code id="result-a"></code> <small class="entropy-data hidden" id="entropy-a"></small><br />
+  <button id="copy-b" title="Copy">Copy</button> <code id="result-b"></code> <small class="entropy-data hidden" id="entropy-b"></small><br />
+  <button id="copy-c" title="Copy">Copy</button> <code id="result-c"></code> <small class="entropy-data hidden" id="entropy-c"></small><br />
+  <button id="copy-d" title="Copy">Copy</button> <code id="result-d"></code> <small class="entropy-data hidden" id="entropy-d"></small><br />
+  <button id="copy-e" title="Copy">Copy</button> <code id="result-e"></code> <small class="entropy-data hidden" id="entropy-e"></small><br />
+  <button id="copy-f" title="Copy">Copy</button> <code id="result-f"></code> <small class="entropy-data hidden" id="entropy-f"></small><br />
+  <button id="copy-g" title="Copy">Copy</button> <code id="result-g"></code> <small class="entropy-data hidden" id="entropy-g"></small><br />
+  <button id="copy-h" title="Copy">Copy</button> <code id="result-h"></code> <small class="entropy-data hidden" id="entropy-h"></small><br />
+  <button id="copy-i" title="Copy">Copy</button> <code id="result-i"></code> <small class="entropy-data hidden" id="entropy-i"></small><br />
+  <button id="copy-j" title="Copy">Copy</button> <code id="result-j"></code> <small class="entropy-data hidden" id="entropy-j"></small><br />
+</div>
+
+<div class="row">
+  <input type="checkbox" id="chkEntropy">
+  <label id="entropyLabel" for="chkEntropy">Show entropy</label>
+</div>
+
+<div class="entropy-data hidden">
+  <small>T = Theoretical entropy, S = Shannon entropy</small><br />
+  <small>Entropy calculated with <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)" target="_blank">Shannon's formula</a> and theoretical entropy based on character pool.</small>
 </div>
 
 <script nonce="${nonce}">
@@ -142,6 +152,16 @@ element('chkSymbols').addEventListener('change', listGenerate);
 element('chkUpper').addEventListener('change', listGenerate);
 element('custom').addEventListener('input', listGenerate);
 
+element('chkEntropy').addEventListener('change', (event) => {
+  Array.from(document.getElementsByClassName('entropy-data')).forEach(element => {
+    if (event.target.checked) {
+      element.classList.remove('hidden');
+    } else {
+      element.classList.add('hidden');
+    }
+  });
+});
+
 element('regenerate').addEventListener('click', listGenerate);
 function listGenerate() {
   const localValues = {
@@ -158,13 +178,20 @@ listGenerate();
 window.addEventListener('message', (event) => {
   if (event.data.type === 'listGenerateMessage') {
     event.data.payload.forEach(item => {
-      const codeEl = element(item.id);
+      console.log(item);
+      const codeEl = element("result-"+ item.id);
       if (codeEl) {
         codeEl.textContent = item.value;
+        codeEl.className = item.entropy.score;
 
-        element('copy-' + item.id.split('-')[1]).onclick = () => {
+        element('copy-' + item.id).onclick = () => {
           vscode.postMessage({ type: 'copy', payload: item.value });
         };
+      }
+
+      const entropyEl = element('entropy-' + item.id);
+      if (entropyEl) {
+        entropyEl.textContent = 'Entropy: T=' + item.entropy.theoreticalBits.toFixed(2) + ' bits, S=' + item.entropy.shannonBits.toFixed(2) + ' bits (' + item.entropy.score.replace('-', ' ') + ')';
       }
     });
   }
