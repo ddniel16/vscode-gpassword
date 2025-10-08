@@ -10,7 +10,8 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [this.context.extensionUri]
+      // Restringimos a la carpeta media que contendrá assets estáticos empaquetados
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
     };
 
     webviewView.webview.onDidReceiveMessage(async msg => {
@@ -55,7 +56,7 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
     const settingsJson = JSON.stringify(settings).replace(/</g, '\\u003c');
 
     // URI al CSS externo
-    const styleUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/style/', 'password.css'));
+  const styleUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'password.css'));
 
     // Nonce para permitir el script
     const nonce = Date.now().toString(36);

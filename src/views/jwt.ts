@@ -16,7 +16,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [this.context.extensionUri]
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
     };
 
     webviewView.webview.onDidReceiveMessage(async msg => {
@@ -54,7 +54,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
 
 
     // URI al CSS externo
-    const styleUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/style/', 'jwt.css'));
+  const styleUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'jwt.css'));
 
     // Nonce para permitir el script
     const nonce = Date.now().toString(36);

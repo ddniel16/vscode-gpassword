@@ -135,7 +135,7 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "icon": "src/svg/lock.svg",
+          "icon": "media/lock.svg",
           "id": "passwordGenerator",
           "title": "gPassword & Encoder Tools"
         }
