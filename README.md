@@ -36,28 +36,43 @@ Esta extensión combina varias herramientas útiles para desarrolladores, como l
 
 ## ¿Cómo usarla?
 
+Tienes 3 formas:
+
+- Con la paleta de comandos
+- Desde el submenú (clic derecho en el editor)
+- Desde el Sidebar (icono de gPassword)
+
+### Paleta de comandos
+
 1. **Abre la paleta de comandos** (`Ctrl+Shift+P` o `Cmd+Shift+P`).
 2. **Busca "gPassword"** para ver todos los comandos disponibles.
 3. **Selecciona el comando**
 
 ![commands](https://raw.githubusercontent.com/ddniel16/vscode-gPassword/main/imgs/commands.png)
 
-## Submenú de gPassword
+### Submenú de gPassword
 
 Puedes acceder a un submenú con todas las opciones de gPassword haciendo clic derecho en el editor. Esto te permite acceder rápidamente a las funciones más utilizadas sin necesidad de recordar los comandos.
 
 ![submenu](https://raw.githubusercontent.com/ddniel16/vscode-gPassword/main/imgs/submenu.png)
 
-## Personaliza la generación de contraseñas
+### Sidebar de gPassword
 
-Por defecto, las contraseñas se generan con una longitud aleatoria entre 20 y 25 caracteres. Puedes cambiar esto en la configuración de la extensión:
+Puedes acceder a la barra lateral de gPassword haciendo clic en el icono de gPassword en la barra lateral de VSCode. Esto te permitirá acceder rápidamente a todas las funciones de la extensión en un solo lugar.
+![sidebar](https://raw.githubusercontent.com/ddniel16/vscode-gPassword/main/imgs/sidebar.png)
 
-- `gpassword.randomLengthMin`: Mínimo de caracteres (entre 15 y 54)
-- `gpassword.randomLengthMax`: Máximo de caracteres (entre 16 y 55)
+## Configuración
 
-![settings](https://raw.githubusercontent.com/ddniel16/vscode-gPassword/main/imgs/settings.png)
+Puedes personalizar la configuración de la extensión a tu gusto. Algunas de las opciones disponibles incluyen:
 
-> Si el valor mínimo es mayor que el máximo, aparecerá un error controlado.
+- Commands
+  - `gpassword.randomLengthMin`: Mínimo de caracteres (entre 15 y 54)
+  - `gpassword.randomLengthMax`: Máximo de caracteres (entre 16 y 55)
+- Sidebar
+  - `gpassword.passwordGeneratorLength`: Longitud por defecto de la contraseña generada (20 por defecto)
+  - `gpassword.passwordGeneratorIncludeNumbers`: Incluir números en la contraseña generada
+  - `gpassword.passwordGeneratorIncludeSymbols`: Incluir símbolos en la contraseña generada
+  - `gpassword.passwordGeneratorIncludeUppercase`: Incluir letras mayúsculas en la contraseña generada
 
 ## ¡Comienza ahora!
 
