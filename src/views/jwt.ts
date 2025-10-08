@@ -35,7 +35,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
             .digest();
 
           if (!crypto.timingSafeEqual(signature, expectedSignature)) {
-            throw new Error('Firma inválida');
+            throw new Error('Invalid signature');
           }
 
           webviewView.webview.postMessage({ type: 'verifyResult', success: true, message: 'JWT válido' });
@@ -84,7 +84,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
   <body>
   <h3>JWT</h3>
 
-  <textarea id="jwtInput" placeholder="Pega tu JWT aquí"></textarea>
+  <textarea id="jwtInput" placeholder="Paste your JWT here"></textarea>
   <button id="decodeButton">Decode</button>
 
   <div id="row">
@@ -121,13 +121,13 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
     try {
       element('jwt-header').textContent = JSON.stringify(JSON.parse(atob(header)), null, 2);
     } catch (e) {
-      element('jwt-header').textContent = 'Header inválido';
+      element('jwt-header').textContent = 'Invalid Header';
     }
 
     try {
       element('jwt-payload').textContent = JSON.stringify(JSON.parse(atob(payload)), null, 2);
     } catch (e) {
-      element('jwt-payload').textContent = 'Payload inválido';
+      element('jwt-payload').textContent = 'Invalid Payload';
     }
 
     element('jwt-signature').textContent = signature || '';
