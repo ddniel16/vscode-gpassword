@@ -121,14 +121,14 @@
     "views": {
       "passwordGenerator": [
         {
-            "id": "passwordGenerator.password",
-            "name": "Password Generator",
-            "type": "webview"
+          "id": "passwordGenerator.password",
+          "name": "Password Generator",
+          "type": "webview"
         },
         {
-            "id": "passwordGenerator.jwt",
-            "name": "JWT Decoder & Validator",
-            "type": "webview"
+          "id": "passwordGenerator.jwt",
+          "name": "JWT Decoder & Validator",
+          "type": "webview"
         }
       ]
     },
@@ -269,5 +269,5 @@
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
   },
-  "version": "0.0.11"
+  "version": "0.1.0"
 }
