@@ -78,4 +78,4 @@ jobs:
             exit 0
           fi
           echo "Publicando en Open VSX..."
-          npx ovsx publish "$VSIX_FILE" --pat "$OVSX_TOKEN" --verbose
+          npx ovsx publish "$VSIX_FILE" --pat "$OVSX_TOKEN"
