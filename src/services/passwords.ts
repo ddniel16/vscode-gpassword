@@ -54,7 +54,7 @@ export class PasswordsGenerator {
       pool += custom; setsRequeridos.push(custom);
     }
 
-    const chars = [];
+    let chars = [];
     for (const set of setsRequeridos) {
       chars.push(set[this.randomIntSecure(set.length)]);
     }
@@ -63,6 +63,7 @@ export class PasswordsGenerator {
       chars.push(pool[this.randomIntSecure(pool.length)]);
     }
     chars = this.shuffle(chars);
+
     return chars.join('');
   }
 }
