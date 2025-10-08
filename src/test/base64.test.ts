@@ -1,6 +1,6 @@
 import assert from 'assert';
 import * as sinon from 'sinon';
-import { Base64 } from '../services/base64';
+import { Base64 } from '../commands/base64';
 
 suite('Base64', () => {
   let editorWindowMock: Record<string, unknown>;
