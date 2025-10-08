@@ -18,5 +18,8 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Run compile
+        run: npm run compile
+
       - name: Run linter
         run: npm run lint
