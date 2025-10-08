@@ -34,19 +34,19 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
             .update(datos)
             .digest();
 
-            if (!crypto.timingSafeEqual(signature, expectedSignature)) {
-              throw new Error('Firma inválida');
-            }
-
-            webviewView.webview.postMessage({ type: 'verifyResult', success: true, message: 'JWT válido' });
-
-          } catch (error) {
-
-            const errorMsg = (error instanceof Error) ? error.message : String(error);
-            webviewView.webview.postMessage({ type: 'verifyResult', success: false, message: errorMsg });
-
+          if (!crypto.timingSafeEqual(signature, expectedSignature)) {
+            throw new Error('Firma inválida');
           }
-      break;
+
+          webviewView.webview.postMessage({ type: 'verifyResult', success: true, message: 'JWT válido' });
+
+        } catch (error) {
+
+          const errorMsg = (error instanceof Error) ? error.message : String(error);
+          webviewView.webview.postMessage({ type: 'verifyResult', success: false, message: errorMsg });
+
+        }
+        break;
       }
       }
 
