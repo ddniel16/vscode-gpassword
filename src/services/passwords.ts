@@ -62,7 +62,7 @@ export class PasswordsGenerator {
     while (chars.length < length) {
       chars.push(pool[this.randomIntSecure(pool.length)]);
     }
-    this.shuffle(chars);
+    chars = this.shuffle(chars);
     return chars.join('');
   }
 }
