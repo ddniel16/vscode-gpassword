@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import * as crypto from 'crypto';
 import * as vscode from "vscode";
 
 export class JWTViewProvider implements vscode.WebviewViewProvider {
