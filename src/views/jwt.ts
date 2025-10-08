@@ -133,7 +133,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
     element('jwt-signature').textContent = signature || '';
   });
 
-  secret.addEventListener('change', async () => {
+  element('secret').addEventListener('change', async () => {
     const jwt = element('jwtInput').value;
     const secret = element('secret').value;
     vscode.postMessage({ type: 'verify', payload: { jwt, secret } });
