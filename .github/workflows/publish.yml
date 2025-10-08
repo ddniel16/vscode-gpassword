@@ -30,9 +30,6 @@ jobs:
           npm ci --no-audit --no-fund
           npm install --global @vscode/vsce@latest ovsx@latest
 
-      - name: Set package version
-        run: npm version ${{ github.ref_name }} --no-git-tag-version
-
       - name: Package the extension
         run: vsce package
 
