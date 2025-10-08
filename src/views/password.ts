@@ -178,7 +178,6 @@ listGenerate();
 window.addEventListener('message', (event) => {
   if (event.data.type === 'listGenerateMessage') {
     event.data.payload.forEach(item => {
-      console.log(item);
       const codeEl = element("result-"+ item.id);
       if (codeEl) {
         codeEl.textContent = item.value;
