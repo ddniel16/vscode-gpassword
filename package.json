@@ -215,23 +215,24 @@
     ]
   },
   "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.4.0",
     "bcrypt": "^6.0.0"
   },
   "description": "Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.",
   "devDependencies": {
     "@types/assert": "^1.5.11",
-    "@types/bcrypt": "^5.0.2",
+    "@types/bcrypt": "^6.0.0",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.0.4",
-    "@types/sinon": "^17.0.4",
+    "@types/node": "^20.16.15",
+    "@types/sinon": "^21.0.0",
     "@types/vscode": "^1.101.0",
-    "@typescript-eslint/eslint-plugin": "^8.35.0",
-    "@typescript-eslint/parser": "^8.35.0",
-    "@vscode/test-cli": "^0.0.11",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.29.0",
-    "sinon": "^21.0.0",
-    "typescript": "^5.8.3"
+    "eslint": "^9.39.2",
+    "sinon": "^21.0.1",
+    "typescript": "^5.9.3"
   },
   "displayName": "Generator password & Encoder Tools",
   "engines": {
