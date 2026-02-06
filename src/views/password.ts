@@ -3,60 +3,89 @@ import * as vscode from "vscode";
 import { PasswordsGenerator } from "../services/passwords";
 import { EntropyCalculator } from "../services/entropy";
 
-export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider {
-
+export class PasswordGeneratorViewProvider
+  implements vscode.WebviewViewProvider
+{
   constructor(private readonly context: vscode.ExtensionContext) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     webviewView.webview.options = {
       enableScripts: true,
       // Restringimos a la carpeta media que contendrá assets estáticos empaquetados
-      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
+      localResourceRoots: [
+        vscode.Uri.joinPath(this.context.extensionUri, "media"),
+      ],
     };
 
-    webviewView.webview.onDidReceiveMessage(async msg => {
+    webviewView.webview.onDidReceiveMessage(async (msg) => {
       const { type, payload } = msg;
 
       switch (type) {
-      case 'listGenerate': {
-        const passwordGenerator = new PasswordsGenerator();
-        const entropyCalculator = new EntropyCalculator();
+        case "listGenerate": {
+          const passwordGenerator = new PasswordsGenerator();
+          const entropyCalculator = new EntropyCalculator();
 
-        const listItems = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
-        let listGenerate: { id: string; value: string, entropy: { theoreticalBits: number, shannonBits: number, score: string } }[] = [];
+          const listItems = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+          let listGenerate: {
+            id: string;
+            value: string;
+            entropy: {
+              theoreticalBits: number;
+              shannonBits: number;
+              score: string;
+            };
+          }[] = [];
 
-        listItems.forEach((item, index) => {
-          const pwd = passwordGenerator.generatePassword(payload);
-          const entropy = entropyCalculator.calculateDetailedEntropy(pwd, payload);
-          listGenerate.push({ "id": item, "value": pwd, "entropy": entropy });
-        });
+          listItems.forEach((item, index) => {
+            const pwd = passwordGenerator.generatePassword(payload);
+            const entropy = entropyCalculator.calculateDetailedEntropy(
+              pwd,
+              payload,
+            );
+            listGenerate.push({ id: item, value: pwd, entropy: entropy });
+          });
 
-        webviewView.webview.postMessage({ type: 'listGenerateMessage', payload: listGenerate });
-        break;
-      }
-      case 'copy': {
-        if (payload) {
-          await vscode.env.clipboard.writeText(payload);
-          vscode.window.showInformationMessage('Password copied to clipboard');
+          webviewView.webview.postMessage({
+            type: "listGenerateMessage",
+            payload: listGenerate,
+          });
+          break;
         }
-        break;
+        case "copy": {
+          if (payload) {
+            await vscode.env.clipboard.writeText(payload);
+            vscode.window.showInformationMessage(
+              "Password copied to clipboard",
+            );
+          }
+          break;
+        }
       }
-      }
-
     });
 
     const cfg = vscode.workspace.getConfiguration("gpassword");
     const settings = {
-      defaultLength: cfg.get<number>('passwordGeneratorLength', 20),
-      includeNumbers: cfg.get<boolean>('passwordGeneratorDefault.includeNumbers', true),
-      includeSymbols: cfg.get<boolean>('passwordGeneratorDefault.includeSymbols', true),
-      includeUppercase: cfg.get<boolean>('passwordGeneratorDefault.includeUppercase', true),
-      customChars: cfg.get<string>('passwordGeneratorDefault.customChars', ''),
+      defaultLength: cfg.get<number>("passwordGeneratorLength", 20),
+      includeNumbers: cfg.get<boolean>(
+        "passwordGeneratorDefault.includeNumbers",
+        true,
+      ),
+      includeSymbols: cfg.get<boolean>(
+        "passwordGeneratorDefault.includeSymbols",
+        true,
+      ),
+      includeUppercase: cfg.get<boolean>(
+        "passwordGeneratorDefault.includeUppercase",
+        true,
+      ),
+      customChars: cfg.get<string>("passwordGeneratorDefault.customChars", ""),
     };
-    const settingsJson = JSON.stringify(settings).replace(/</g, '\\u003c');
+    const settingsJson = JSON.stringify(settings).replace(/</g, "\\u003c");
 
     // URI al CSS externo
-  const styleUri = webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'password.css'));
+    const styleUri = webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(this.context.extensionUri, "media", "password.css"),
+    );
 
     // Nonce para permitir el script
     const nonce = Date.now().toString(36);
@@ -72,8 +101,8 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
       "object-src 'none'",
       "frame-src 'none'",
       "base-uri 'none'",
-      "form-action 'none'"
-    ].join('; ');
+      "form-action 'none'",
+    ].join("; ");
 
     webviewView.webview.html = `<!DOCTYPE html>
 <html lang="en">
@@ -91,41 +120,41 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
 </div>
 
 <div class="row">
-  <input type="checkbox" id="chkNumbers" ${settings.includeNumbers?'checked':''}>
+  <input type="checkbox" id="chkNumbers" ${settings.includeNumbers ? "checked" : ""}>
   <label id="numbersLabel" for="chkNumbers">Numbers</label>
 </div>
 
 <div class="row">
-  <input type="checkbox" id="chkSymbols" ${settings.includeSymbols?'checked':''}>
+  <input type="checkbox" id="chkSymbols" ${settings.includeSymbols ? "checked" : ""}>
   <label id="symbolsLabel" for="chkSymbols">Symbols</label>
 </div>
 
 <div class="row">
-  <input type="checkbox" id="chkUpper" ${settings.includeUppercase?'checked':''}>
+  <input type="checkbox" id="chkUpper" ${settings.includeUppercase ? "checked" : ""}>
   <label id="upperLabel" for="chkUpper">Uppercase</label>
 </div>
 
 <div class="col">
   <label id="customLabel" for="custom">Custom chars</label>
-  <input id="custom" class="inline-input" type="text" value="${settings.customChars}" placeholder="Extra chars">
+  <input id="custom" class="inline-input" type="text" value="${settings.customChars}" placeholder="Extra chars" />
   <small id="customHelp">Will mix into the password</small>
 </div>
 
 <hr />
 
-<button id="regenerate" title="Generate">Regenerate list</button>
+<button id="regenerate" type="button" title="Generate">Regenerate list</button>
 
 <div class="listItems">
-  <button id="copy-a" title="Copy">Copy</button> <code id="result-a"></code> <small class="entropy-data hidden" id="entropy-a"></small><br />
-  <button id="copy-b" title="Copy">Copy</button> <code id="result-b"></code> <small class="entropy-data hidden" id="entropy-b"></small><br />
-  <button id="copy-c" title="Copy">Copy</button> <code id="result-c"></code> <small class="entropy-data hidden" id="entropy-c"></small><br />
-  <button id="copy-d" title="Copy">Copy</button> <code id="result-d"></code> <small class="entropy-data hidden" id="entropy-d"></small><br />
-  <button id="copy-e" title="Copy">Copy</button> <code id="result-e"></code> <small class="entropy-data hidden" id="entropy-e"></small><br />
-  <button id="copy-f" title="Copy">Copy</button> <code id="result-f"></code> <small class="entropy-data hidden" id="entropy-f"></small><br />
-  <button id="copy-g" title="Copy">Copy</button> <code id="result-g"></code> <small class="entropy-data hidden" id="entropy-g"></small><br />
-  <button id="copy-h" title="Copy">Copy</button> <code id="result-h"></code> <small class="entropy-data hidden" id="entropy-h"></small><br />
-  <button id="copy-i" title="Copy">Copy</button> <code id="result-i"></code> <small class="entropy-data hidden" id="entropy-i"></small><br />
-  <button id="copy-j" title="Copy">Copy</button> <code id="result-j"></code> <small class="entropy-data hidden" id="entropy-j"></small><br />
+  <button id="copy-a" type="button" title="Copy">Copy</button> <code id="result-a"></code> <small class="entropy-data hidden" id="entropy-a"></small><br />
+  <button id="copy-b" type="button" title="Copy">Copy</button> <code id="result-b"></code> <small class="entropy-data hidden" id="entropy-b"></small><br />
+  <button id="copy-c" type="button" title="Copy">Copy</button> <code id="result-c"></code> <small class="entropy-data hidden" id="entropy-c"></small><br />
+  <button id="copy-d" type="button" title="Copy">Copy</button> <code id="result-d"></code> <small class="entropy-data hidden" id="entropy-d"></small><br />
+  <button id="copy-e" type="button" title="Copy">Copy</button> <code id="result-e"></code> <small class="entropy-data hidden" id="entropy-e"></small><br />
+  <button id="copy-f" type="button" title="Copy">Copy</button> <code id="result-f"></code> <small class="entropy-data hidden" id="entropy-f"></small><br />
+  <button id="copy-g" type="button" title="Copy">Copy</button> <code id="result-g"></code> <small class="entropy-data hidden" id="entropy-g"></small><br />
+  <button id="copy-h" type="button" title="Copy">Copy</button> <code id="result-h"></code> <small class="entropy-data hidden" id="entropy-h"></small><br />
+  <button id="copy-i" type="button" title="Copy">Copy</button> <code id="result-i"></code> <small class="entropy-data hidden" id="entropy-i"></small><br />
+  <button id="copy-j" type="button" title="Copy">Copy</button> <code id="result-j"></code> <small class="entropy-data hidden" id="entropy-j"></small><br />
 </div>
 
 <div class="row">

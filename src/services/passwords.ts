@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from "crypto";
 
 interface PasswordOptions {
   numbers: boolean;
@@ -29,29 +29,33 @@ export class PasswordsGenerator {
   public generatePassword(settings: PasswordOptions): string {
     const length = settings.length || 12;
     if (length < 4) {
-      throw new Error('La longitud mínima recomendada es 4');
+      throw new Error("La longitud mínima recomendada es 4");
     }
 
-    const lower = 'abcdefghijklmnopqrstuvwxyz';
-    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '0123456789';
+    const lower = "abcdefghijklmnopqrstuvwxyz";
+    const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
     const symbols = "[]{}()¿?-_.:,;><|/¡!^*+=@#$%&~`'\"";
-    const custom = settings.customChars || '';
+    const custom = settings.customChars || "";
 
     let pool = lower;
     const setsRequeridos = [lower];
 
     if (settings.uppercase) {
-      pool += upper; setsRequeridos.push(upper);
+      pool += upper;
+      setsRequeridos.push(upper);
     }
     if (settings.numbers) {
-      pool += numbers; setsRequeridos.push(numbers);
+      pool += numbers;
+      setsRequeridos.push(numbers);
     }
     if (settings.symbols) {
-      pool += symbols; setsRequeridos.push(symbols);
+      pool += symbols;
+      setsRequeridos.push(symbols);
     }
     if (custom) {
-      pool += custom; setsRequeridos.push(custom);
+      pool += custom;
+      setsRequeridos.push(custom);
     }
 
     let chars = [];
@@ -64,6 +68,6 @@ export class PasswordsGenerator {
     }
     chars = this.shuffle(chars);
 
-    return chars.join('');
+    return chars.join("");
   }
 }
