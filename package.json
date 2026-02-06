@@ -129,6 +129,16 @@
           "id": "passwordGenerator.jwt",
           "name": "JWT Decoder & Validator",
           "type": "webview"
+        },
+        {
+          "id": "passwordGenerator.base64",
+          "name": "Base64 Encoder/Decoder",
+          "type": "webview"
+        },
+        {
+          "id": "passwordGenerator.salts",
+          "name": "Salts Generator",
+          "type": "webview"
         }
       ]
     },

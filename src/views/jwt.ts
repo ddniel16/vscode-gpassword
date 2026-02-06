@@ -84,7 +84,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
     ].join("; ");
 
     webviewView.webview.html = `<!DOCTYPE html>
-  <html lang="es">
+  <html lang="en">
   <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="${csp}">
