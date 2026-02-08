@@ -1,7 +1,11 @@
 import * as crypto from "crypto";
 import * as vscode from "vscode";
 
+export const JWT_VIEW_ID = "passwordGenerator.jwt";
+
 export class JWTViewProvider implements vscode.WebviewViewProvider {
+  public static readonly viewId = JWT_VIEW_ID;
+
   constructor(private readonly context: vscode.ExtensionContext) {}
 
   private base64urlDecode(str: string): Buffer {
@@ -45,7 +49,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
             webviewView.webview.postMessage({
               type: "verifyResult",
               success: true,
-              message: "JWT válido",
+              message: "JWT is valid",
             });
           } catch (error) {
             const errorMsg =

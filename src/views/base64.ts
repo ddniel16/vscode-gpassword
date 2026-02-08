@@ -1,6 +1,10 @@
 import * as vscode from "vscode";
 
+export const BASE64_VIEW_ID = "passwordGenerator.base64";
+
 export class Base64ViewProvider implements vscode.WebviewViewProvider {
+  public static readonly viewId = BASE64_VIEW_ID;
+
   constructor(private readonly context: vscode.ExtensionContext) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {

@@ -2,10 +2,13 @@ import * as vscode from "vscode";
 
 import { PasswordsGenerator } from "../services/passwords";
 import { EntropyCalculator } from "../services/entropy";
+export const PASSWORD_GENERATOR_VIEW_ID = "passwordGenerator.password";
 
 export class PasswordGeneratorViewProvider
   implements vscode.WebviewViewProvider
 {
+  public static readonly viewId = PASSWORD_GENERATOR_VIEW_ID;
+
   constructor(private readonly context: vscode.ExtensionContext) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {

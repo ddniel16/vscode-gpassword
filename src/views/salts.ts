@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
 import crypto from "crypto";
 
+export const SALTS_VIEW_ID = "passwordGenerator.salts";
+
 export class SaltsViewProvider implements vscode.WebviewViewProvider {
+  public static readonly viewId = SALTS_VIEW_ID;
+
   constructor(private readonly context: vscode.ExtensionContext) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {

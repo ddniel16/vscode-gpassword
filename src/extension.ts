@@ -101,7 +101,7 @@ export function activate(context: ExtensionContext) {
   // Password Generator
   context.subscriptions.push(
     window.registerWebviewViewProvider(
-      "passwordGenerator.password",
+      PasswordGeneratorViewProvider.viewId,
       new PasswordGeneratorViewProvider(context),
     ),
   );
@@ -109,7 +109,7 @@ export function activate(context: ExtensionContext) {
   // JWT Generator
   context.subscriptions.push(
     window.registerWebviewViewProvider(
-      "passwordGenerator.jwt",
+      JWTViewProvider.viewId,
       new JWTViewProvider(context),
     ),
   );
@@ -117,7 +117,7 @@ export function activate(context: ExtensionContext) {
   // Base64 Encoder/Decoder
   context.subscriptions.push(
     window.registerWebviewViewProvider(
-      "passwordGenerator.base64",
+      Base64ViewProvider.viewId,
       new Base64ViewProvider(context),
     ),
   );
@@ -125,8 +125,10 @@ export function activate(context: ExtensionContext) {
   // Salts Generator
   context.subscriptions.push(
     window.registerWebviewViewProvider(
-      "passwordGenerator.salts",
+      SaltsViewProvider.viewId,
       new SaltsViewProvider(context),
     ),
   );
 }
+
+export function deactivate(): void {}
