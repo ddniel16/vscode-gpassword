@@ -130,16 +130,16 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
 <button id="regenerate" type="button" title="Generate">Regenerate list</button>
 
 <div class="listItems">
-  <button id="copy-a" type="button" title="Copy">Copy</button> <code id="result-a"></code> <small class="entropy-data hidden" id="entropy-a"></small><br />
-  <button id="copy-b" type="button" title="Copy">Copy</button> <code id="result-b"></code> <small class="entropy-data hidden" id="entropy-b"></small><br />
-  <button id="copy-c" type="button" title="Copy">Copy</button> <code id="result-c"></code> <small class="entropy-data hidden" id="entropy-c"></small><br />
-  <button id="copy-d" type="button" title="Copy">Copy</button> <code id="result-d"></code> <small class="entropy-data hidden" id="entropy-d"></small><br />
-  <button id="copy-e" type="button" title="Copy">Copy</button> <code id="result-e"></code> <small class="entropy-data hidden" id="entropy-e"></small><br />
-  <button id="copy-f" type="button" title="Copy">Copy</button> <code id="result-f"></code> <small class="entropy-data hidden" id="entropy-f"></small><br />
-  <button id="copy-g" type="button" title="Copy">Copy</button> <code id="result-g"></code> <small class="entropy-data hidden" id="entropy-g"></small><br />
-  <button id="copy-h" type="button" title="Copy">Copy</button> <code id="result-h"></code> <small class="entropy-data hidden" id="entropy-h"></small><br />
-  <button id="copy-i" type="button" title="Copy">Copy</button> <code id="result-i"></code> <small class="entropy-data hidden" id="entropy-i"></small><br />
-  <button id="copy-j" type="button" title="Copy">Copy</button> <code id="result-j"></code> <small class="entropy-data hidden" id="entropy-j"></small><br />
+  <div><button id="copy-a" type="button" title="Copy">Copy</button> <code id="result-a"></code> <small class="entropy-data hidden" id="entropy-a"></small><br /></div>
+  <div><button id="copy-b" type="button" title="Copy">Copy</button> <code id="result-b"></code> <small class="entropy-data hidden" id="entropy-b"></small><br /></div>
+  <div><button id="copy-c" type="button" title="Copy">Copy</button> <code id="result-c"></code> <small class="entropy-data hidden" id="entropy-c"></small><br /></div>
+  <div><button id="copy-d" type="button" title="Copy">Copy</button> <code id="result-d"></code> <small class="entropy-data hidden" id="entropy-d"></small><br /></div>
+  <div><button id="copy-e" type="button" title="Copy">Copy</button> <code id="result-e"></code> <small class="entropy-data hidden" id="entropy-e"></small><br /></div>
+  <div><button id="copy-f" type="button" title="Copy">Copy</button> <code id="result-f"></code> <small class="entropy-data hidden" id="entropy-f"></small><br /></div>
+  <div><button id="copy-g" type="button" title="Copy">Copy</button> <code id="result-g"></code> <small class="entropy-data hidden" id="entropy-g"></small><br /></div>
+  <div><button id="copy-h" type="button" title="Copy">Copy</button> <code id="result-h"></code> <small class="entropy-data hidden" id="entropy-h"></small><br /></div>
+  <div><button id="copy-i" type="button" title="Copy">Copy</button> <code id="result-i"></code> <small class="entropy-data hidden" id="entropy-i"></small><br /></div>
+  <div><button id="copy-j" type="button" title="Copy">Copy</button> <code id="result-j"></code> <small class="entropy-data hidden" id="entropy-j"></small><br /></div>
 </div>
 
 <div class="row">
