@@ -6,23 +6,23 @@ export class JWT {
   }
 
   base64UrlDecode(string: string): string {
-    let base64 = string.replace(/-/g, '+').replace(/_/g, '/');
-    const padding = '='.repeat((4 - base64.length % 4) % 4);
+    let base64 = string.replace(/-/g, "+").replace(/_/g, "/");
+    const padding = "=".repeat((4 - (base64.length % 4)) % 4);
     base64 += padding;
-    return Buffer.from(base64, 'base64').toString('utf-8');
+    return Buffer.from(base64, "base64").toString("utf-8");
   }
 
   checkStringIsJWT(string: string): boolean {
-    const parts = string.split('.');
+    const parts = string.split(".");
     if (parts.length !== 3) {
-      this.vscodeWindow.showErrorMessage('Invalid JWT');
+      this.vscodeWindow.showErrorMessage("Invalid JWT");
       return false;
     }
 
-    const isValid = parts.every(part => /^[A-Za-z0-9-_]*$/.test(part));
+    const isValid = parts.every((part) => /^[A-Za-z0-9-_]*$/.test(part));
 
     if (!isValid) {
-      this.vscodeWindow.showErrorMessage('Invalid JWT');
+      this.vscodeWindow.showErrorMessage("Invalid JWT");
       return false;
     }
 
@@ -54,14 +54,14 @@ export class JWT {
       return;
     }
 
-    const [header, payload, signature] = textSelected.split('.');
+    const [header, payload, signature] = textSelected.split(".");
 
     let decodedText = {};
     try {
       decodedText = {
         header: JSON.parse(this.base64UrlDecode(header)),
         payload: JSON.parse(this.base64UrlDecode(payload)),
-        signature: signature
+        signature: signature,
       };
     } catch (error) {
       this.vscodeWindow.showErrorMessage("Error decoding JWT");

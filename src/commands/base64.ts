@@ -19,7 +19,7 @@ export class Base64 {
     activeTextEditor.edit((editBuilder: any) => {
       for (const selection of activeTextEditor.selections) {
         let textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, Buffer.from(textSelected, 'utf-8').toString('base64'));
+        editBuilder.replace(selection, Buffer.from(textSelected, "utf-8").toString("base64"));
       }
     });
 
@@ -41,7 +41,7 @@ export class Base64 {
     activeTextEditor.edit((editBuilder: any) => {
       for (const selection of activeTextEditor.selections) {
         let textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, Buffer.from(textSelected, 'base64').toString('utf-8'));
+        editBuilder.replace(selection, Buffer.from(textSelected, "base64").toString("utf-8"));
       }
     });
 

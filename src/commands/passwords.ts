@@ -22,8 +22,8 @@ export class Passwords {
       numbers: false,
       symbols: false,
       uppercase: true,
-      customChars: '',
-      length: this.randomNumber()
+      customChars: "",
+      length: this.randomNumber(),
     });
 
     this.printPassword(password);
@@ -35,8 +35,8 @@ export class Passwords {
       numbers: true,
       symbols: false,
       uppercase: true,
-      customChars: '',
-      length: this.randomNumber()
+      customChars: "",
+      length: this.randomNumber(),
     });
 
     this.printPassword(password);
@@ -48,8 +48,8 @@ export class Passwords {
       numbers: true,
       symbols: true,
       uppercase: true,
-      customChars: '',
-      length: this.randomNumber()
+      customChars: "",
+      length: this.randomNumber(),
     });
 
     this.printPassword(password);

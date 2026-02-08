@@ -11,9 +11,7 @@ export class SaltsViewProvider implements vscode.WebviewViewProvider {
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [
-        vscode.Uri.joinPath(this.context.extensionUri, "media"),
-      ],
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
     };
 
     webviewView.webview.onDidReceiveMessage(async (msg) => {
@@ -63,7 +61,7 @@ export class SaltsViewProvider implements vscode.WebviewViewProvider {
     });
 
     const styleUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, "media", "salts.css"),
+      vscode.Uri.joinPath(this.context.extensionUri, "media", "salts.css")
     );
 
     const nonce = Date.now().toString(36);
@@ -196,13 +194,9 @@ export class SaltsViewProvider implements vscode.WebviewViewProvider {
     ];
 
     if (format === "env") {
-      return hashKeys
-        .map((key) => `${key}='${this.generateSalt()}'`)
-        .join("\n");
+      return hashKeys.map((key) => `${key}='${this.generateSalt()}'`).join("\n");
     } else {
-      return hashKeys
-        .map((key) => `${key}: "${this.generateSalt()}"`)
-        .join("\n");
+      return hashKeys.map((key) => `${key}: "${this.generateSalt()}"`).join("\n");
     }
   }
 

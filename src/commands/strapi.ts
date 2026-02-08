@@ -20,7 +20,7 @@ export class Strapi {
         crypto.randomBytes(16).toString("base64"),
         crypto.randomBytes(16).toString("base64"),
         crypto.randomBytes(16).toString("base64"),
-        crypto.randomBytes(16).toString("base64")
+        crypto.randomBytes(16).toString("base64"),
       ].join(","),
       API_TOKEN_SALT: crypto.randomBytes(16).toString("base64"),
       TRANSFER_TOKEN_SALT: crypto.randomBytes(16).toString("base64"),

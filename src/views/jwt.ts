@@ -21,9 +21,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [
-        vscode.Uri.joinPath(this.context.extensionUri, "media"),
-      ],
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
     };
 
     webviewView.webview.onDidReceiveMessage(async (msg) => {
@@ -32,15 +30,11 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
       switch (type) {
         case "verify": {
           try {
-            const [jwtHeader, jwtPayload, jwtSignature] =
-              payload.jwt.split(".");
+            const [jwtHeader, jwtPayload, jwtSignature] = payload.jwt.split(".");
             const signature = this.base64urlDecode(jwtSignature);
 
             const datos = `${jwtHeader}.${jwtPayload}`;
-            const expectedSignature = crypto
-              .createHmac("sha256", payload.secret)
-              .update(datos)
-              .digest();
+            const expectedSignature = crypto.createHmac("sha256", payload.secret).update(datos).digest();
 
             if (!crypto.timingSafeEqual(signature, expectedSignature)) {
               throw new Error("Invalid signature");
@@ -52,8 +46,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
               message: "JWT is valid",
             });
           } catch (error) {
-            const errorMsg =
-              error instanceof Error ? error.message : String(error);
+            const errorMsg = error instanceof Error ? error.message : String(error);
             webviewView.webview.postMessage({
               type: "verifyResult",
               success: false,
@@ -67,7 +60,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
 
     // URI al CSS externo
     const styleUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, "media", "jwt.css"),
+      vscode.Uri.joinPath(this.context.extensionUri, "media", "jwt.css")
     );
 
     // Nonce para permitir el script

@@ -10,9 +10,7 @@ export class Base64ViewProvider implements vscode.WebviewViewProvider {
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [
-        vscode.Uri.joinPath(this.context.extensionUri, "media"),
-      ],
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
     };
 
     webviewView.webview.onDidReceiveMessage(async (msg) => {
@@ -60,7 +58,7 @@ export class Base64ViewProvider implements vscode.WebviewViewProvider {
     });
 
     const styleUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, "media", "base64.css"),
+      vscode.Uri.joinPath(this.context.extensionUri, "media", "base64.css")
     );
 
     const nonce = Date.now().toString(36);

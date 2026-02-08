@@ -4,9 +4,7 @@ import { PasswordsGenerator } from "../services/passwords";
 import { EntropyCalculator } from "../services/entropy";
 export const PASSWORD_GENERATOR_VIEW_ID = "passwordGenerator.password";
 
-export class PasswordGeneratorViewProvider
-  implements vscode.WebviewViewProvider
-{
+export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewId = PASSWORD_GENERATOR_VIEW_ID;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
@@ -15,9 +13,7 @@ export class PasswordGeneratorViewProvider
     webviewView.webview.options = {
       enableScripts: true,
       // Restringimos a la carpeta media que contendrá assets estáticos empaquetados
-      localResourceRoots: [
-        vscode.Uri.joinPath(this.context.extensionUri, "media"),
-      ],
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
     };
 
     webviewView.webview.onDidReceiveMessage(async (msg) => {
@@ -41,10 +37,7 @@ export class PasswordGeneratorViewProvider
 
           listItems.forEach((item, index) => {
             const pwd = passwordGenerator.generatePassword(payload);
-            const entropy = entropyCalculator.calculateDetailedEntropy(
-              pwd,
-              payload,
-            );
+            const entropy = entropyCalculator.calculateDetailedEntropy(pwd, payload);
             listGenerate.push({ id: item, value: pwd, entropy: entropy });
           });
 
@@ -57,9 +50,7 @@ export class PasswordGeneratorViewProvider
         case "copy": {
           if (payload) {
             await vscode.env.clipboard.writeText(payload);
-            vscode.window.showInformationMessage(
-              "Password copied to clipboard",
-            );
+            vscode.window.showInformationMessage("Password copied to clipboard");
           }
           break;
         }
@@ -69,25 +60,16 @@ export class PasswordGeneratorViewProvider
     const cfg = vscode.workspace.getConfiguration("gpassword");
     const settings = {
       defaultLength: cfg.get<number>("passwordGeneratorLength", 20),
-      includeNumbers: cfg.get<boolean>(
-        "passwordGeneratorDefault.includeNumbers",
-        true,
-      ),
-      includeSymbols: cfg.get<boolean>(
-        "passwordGeneratorDefault.includeSymbols",
-        true,
-      ),
-      includeUppercase: cfg.get<boolean>(
-        "passwordGeneratorDefault.includeUppercase",
-        true,
-      ),
+      includeNumbers: cfg.get<boolean>("passwordGeneratorDefault.includeNumbers", true),
+      includeSymbols: cfg.get<boolean>("passwordGeneratorDefault.includeSymbols", true),
+      includeUppercase: cfg.get<boolean>("passwordGeneratorDefault.includeUppercase", true),
       customChars: cfg.get<string>("passwordGeneratorDefault.customChars", ""),
     };
     const settingsJson = JSON.stringify(settings).replace(/</g, "\\u003c");
 
     // URI al CSS externo
     const styleUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, "media", "password.css"),
+      vscode.Uri.joinPath(this.context.extensionUri, "media", "password.css")
     );
 
     // Nonce para permitir el script

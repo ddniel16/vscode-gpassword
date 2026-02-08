@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 
 export class WordPressSalts {
   hashKeys: string[];
@@ -19,8 +19,8 @@ export class WordPressSalts {
   }
 
   generateSalt(): string {
-    const excludeChars = ["'", "\"", "\\"];
-    let salt = '';
+    const excludeChars = ["'", '"', "\\"];
+    let salt = "";
 
     while (salt.length < 64) {
       const charCode = crypto.randomInt(33, 127);
@@ -40,7 +40,7 @@ export class WordPressSalts {
       return;
     }
 
-    let yml = this.hashKeys.map(key => `${key}: "${this.generateSalt()}"`).join('\n');
+    let yml = this.hashKeys.map((key) => `${key}: "${this.generateSalt()}"`).join("\n");
 
     const selection = activeTextEditor.selection;
     activeTextEditor.edit(function (editBuilder: any) {
@@ -60,7 +60,7 @@ export class WordPressSalts {
 
     console.log();
 
-    let env = this.hashKeys.map(key => `${key}='${this.generateSalt()}'`).join('\n');
+    let env = this.hashKeys.map((key) => `${key}='${this.generateSalt()}'`).join("\n");
 
     const selection = activeTextEditor.selection;
     activeTextEditor.edit(function (editBuilder: any) {

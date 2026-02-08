@@ -1,0 +1,12 @@
+# Archivos compilados
+out/
+dist/
+
+# Dependencias
+node_modules/
+
+# Archivos de definición de tipos
+*.d.ts
+
+# Archivos de configuración de paquetes
+package-lock.json

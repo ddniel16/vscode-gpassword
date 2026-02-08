@@ -1,5 +1,4 @@
 export class EntropyCalculator {
-
   private calculateShannonEntropy(password: string): number {
     const n = password.length;
     if (!n) {
@@ -28,17 +27,29 @@ export class EntropyCalculator {
   }
 
   private classify(bits: number): string {
-    if (bits < 40) { return 'very-weak'; }
-    if (bits < 60) { return 'weak'; }
-    if (bits < 80) { return 'medium'; }
-    if (bits < 100) { return 'strong'; }
-    return 'very-strong';
+    if (bits < 40) {
+      return "very-weak";
+    }
+    if (bits < 60) {
+      return "weak";
+    }
+    if (bits < 80) {
+      return "medium";
+    }
+    if (bits < 100) {
+      return "strong";
+    }
+    return "very-strong";
   }
 
-  private detectCategories(password: string, opts: { uppercase?: boolean; numbers?: boolean; symbols?: boolean }, custom: string): number {
+  private detectCategories(
+    password: string,
+    opts: { uppercase?: boolean; numbers?: boolean; symbols?: boolean },
+    custom: string
+  ): number {
     let presentes = 0;
     const symbols = "[]{}()¿?-_.:,;><|/¡!^*+=@#$%&~`'\"";
-    const regexSymbols = opts.symbols ? new RegExp('[' + symbols.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + ']') : null;
+    const regexSymbols = opts.symbols ? new RegExp("[" + symbols.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&") + "]") : null;
 
     if (/[a-z]/.test(password)) {
       presentes++;
@@ -56,30 +67,41 @@ export class EntropyCalculator {
       presentes++;
     }
 
-    if (custom && new RegExp('[' + custom.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + ']').test(password)) {
+    if (custom && new RegExp("[" + custom.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&") + "]").test(password)) {
       presentes++;
     }
 
     return presentes;
   }
 
-  public calculateDetailedEntropy(password: string, opts: { uppercase?: boolean; numbers?: boolean; symbols?: boolean; custom?: string }): {
-    theoreticalBits: number,
-    shannonBits: number,
-    score: string,
+  public calculateDetailedEntropy(
+    password: string,
+    opts: { uppercase?: boolean; numbers?: boolean; symbols?: boolean; custom?: string }
+  ): {
+    theoreticalBits: number;
+    shannonBits: number;
+    score: string;
   } {
-    const lower = 'abcdefghijklmnopqrstuvwxyz';
-    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '0123456789';
+    const lower = "abcdefghijklmnopqrstuvwxyz";
+    const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
     const symbols = "[]{}()¿?-_.:,;><|/¡!^*+=@#$%&~`'\"";
-    const custom = opts.custom || '';
+    const custom = opts.custom || "";
 
     let poolSize = lower.length; // base
 
-    if (opts.uppercase) { poolSize += upper.length; }
-    if (opts.numbers) { poolSize += numbers.length; }
-    if (opts.symbols) { poolSize += symbols.length; }
-    if (custom) { poolSize += custom.length; }
+    if (opts.uppercase) {
+      poolSize += upper.length;
+    }
+    if (opts.numbers) {
+      poolSize += numbers.length;
+    }
+    if (opts.symbols) {
+      poolSize += symbols.length;
+    }
+    if (custom) {
+      poolSize += custom.length;
+    }
 
     const theoreticalBits = this.calculateTheoreticalEntropy(password.length, poolSize);
     const shannonBits = this.calculateShannonEntropy(password);
@@ -94,7 +116,7 @@ export class EntropyCalculator {
     return {
       theoreticalBits,
       shannonBits,
-      score
+      score,
     };
   }
 }

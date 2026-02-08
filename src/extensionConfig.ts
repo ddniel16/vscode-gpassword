@@ -1,4 +1,3 @@
-
 interface ExtensionConfigType {
   randomLengthMin: number;
   randomLengthMax: number;
