@@ -88,6 +88,7 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
 
   <div class="copy-section">
     <button id="copyBtn" class="button button-secondary">Copy</button>
+    <button id="clearBtn" class="button button-secondary">Clear</button>
   </div>
 </div>
 
@@ -100,6 +101,7 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
   const strapiEnvBtn = document.getElementById('strapiEnvBtn');
   const strapiYamlBtn = document.getElementById('strapiYamlBtn');
   const copyBtn = document.getElementById('copyBtn');
+  const clearBtn = document.getElementById('clearBtn');
 
   wordpressEnvBtn.addEventListener('click', () => {
     vscode.postMessage({ type: 'wordpress-env' });
@@ -122,6 +124,10 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
     if (text) {
       vscode.postMessage({ type: 'copy', payload: text });
     }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    textarea.value = '';
   });
 
   window.addEventListener('message', (event) => {

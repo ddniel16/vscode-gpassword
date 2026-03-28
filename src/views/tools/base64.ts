@@ -78,6 +78,7 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
     <button id="encodeBtn" class="button">Encode</button>
     <button id="decodeBtn" class="button">Decode</button>
     <button id="copyBtn" class="button button-secondary">Copy</button>
+    <button id="clearBtn" class="button button-secondary">Clear</button>
   </div>
 </div>
 
@@ -88,6 +89,7 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
   const encodeBtn = document.getElementById('encodeBtn');
   const decodeBtn = document.getElementById('decodeBtn');
   const copyBtn = document.getElementById('copyBtn');
+  const clearBtn = document.getElementById('clearBtn');
 
   encodeBtn.addEventListener('click', () => {
     const text = textarea.value;
@@ -108,6 +110,10 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
     if (text) {
       vscode.postMessage({ type: 'copy', payload: text });
     }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    textarea.value = '';
   });
 
   window.addEventListener('message', (event) => {
