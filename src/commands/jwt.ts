@@ -1,39 +1,17 @@
+import * as vscode from "vscode";
+import { validateJWT, decodeJWT } from "../services/jwt";
+
 export class JWT {
-  vscodeWindow: any;
+  vscodeWindow: typeof vscode.window;
 
-  constructor(vscodeWindow: any) {
+  constructor(vscodeWindow: typeof vscode.window) {
     this.vscodeWindow = vscodeWindow;
-  }
-
-  base64UrlDecode(string: string): string {
-    let base64 = string.replace(/-/g, "+").replace(/_/g, "/");
-    const padding = "=".repeat((4 - (base64.length % 4)) % 4);
-    base64 += padding;
-    return Buffer.from(base64, "base64").toString("utf-8");
-  }
-
-  checkStringIsJWT(string: string): boolean {
-    const parts = string.split(".");
-    if (parts.length !== 3) {
-      this.vscodeWindow.showErrorMessage("Invalid JWT");
-      return false;
-    }
-
-    const isValid = parts.every((part) => /^[A-Za-z0-9-_]*$/.test(part));
-
-    if (!isValid) {
-      this.vscodeWindow.showErrorMessage("Invalid JWT");
-      return false;
-    }
-
-    return true;
   }
 
   decode(): void {
     const activeTextEditor = this.vscodeWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
       this.vscodeWindow.showErrorMessage("No active text editor found. Please open a file and try again.");
-      console.log("No active text editor found. Please open a file and try again.");
       return;
     }
 
@@ -49,26 +27,21 @@ export class JWT {
       return;
     }
 
-    if (!this.checkStringIsJWT(textSelected)) {
-      this.vscodeWindow.showErrorMessage("Invalid JWT");
+    const validation = validateJWT(textSelected);
+    if (!validation.valid) {
+      this.vscodeWindow.showErrorMessage(validation.error ?? "Invalid JWT");
       return;
     }
 
-    const [header, payload, signature] = textSelected.split(".");
-
-    let decodedText = {};
+    let decodedText;
     try {
-      decodedText = {
-        header: JSON.parse(this.base64UrlDecode(header)),
-        payload: JSON.parse(this.base64UrlDecode(payload)),
-        signature: signature,
-      };
-    } catch (error) {
+      decodedText = decodeJWT(textSelected);
+    } catch {
       this.vscodeWindow.showErrorMessage("Error decoding JWT");
       return;
     }
 
-    activeTextEditor.edit(function (editBuilder: any) {
+    activeTextEditor.edit((editBuilder) => {
       for (const selection of activeTextEditor.selections) {
         editBuilder.replace(selection, JSON.stringify(decodedText, null, 2));
       }

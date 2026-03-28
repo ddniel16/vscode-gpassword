@@ -8,12 +8,14 @@ import { ExtensionConfig } from "./extensionConfig";
 import { WordPressSalts } from "./commands/wordPressSalts";
 import { JWT } from "./commands/jwt";
 import { Strapi } from "./commands/strapi";
+import { Url } from "./commands/url";
 
 // Import views
 import { PasswordGeneratorViewProvider } from "./views/password";
 import { JWTViewProvider } from "./views/jwt";
 import { Base64ViewProvider } from "./views/base64";
 import { SaltsViewProvider } from "./views/salts";
+import { UrlViewProvider } from "./views/url";
 
 export const extConfig: ExtensionConfig = {} as ExtensionConfig;
 
@@ -22,6 +24,18 @@ export function activate(context: ExtensionContext) {
   if (config) {
     Object.assign(extConfig, config);
   }
+
+  // Reactive config: update extConfig when settings change
+  context.subscriptions.push(
+    workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("gpassword")) {
+        const updated = workspace.getConfiguration().get("gpassword");
+        if (updated) {
+          Object.assign(extConfig, updated);
+        }
+      }
+    })
+  );
 
   // * Register commands
 
@@ -96,6 +110,18 @@ export function activate(context: ExtensionContext) {
     })
   );
 
+  // URL Encode/Decode
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.UrlEncode", () => {
+      new Url(window).encode();
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.UrlDecode", () => {
+      new Url(window).decode();
+    })
+  );
+
   // * Register views
 
   // Password Generator
@@ -115,6 +141,9 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     window.registerWebviewViewProvider(SaltsViewProvider.viewId, new SaltsViewProvider(context))
   );
+
+  // URL Encoder/Decoder
+  context.subscriptions.push(window.registerWebviewViewProvider(UrlViewProvider.viewId, new UrlViewProvider(context)));
 }
 
 export function deactivate(): void {}

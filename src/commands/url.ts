@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import * as base64Service from "../services/base64";
+import * as urlService from "../services/url";
 
-export class Base64 {
+export class Url {
   vscodeWindow: typeof vscode.window;
 
   constructor(vscodeWindow: typeof vscode.window) {
@@ -18,11 +18,11 @@ export class Base64 {
     activeTextEditor.edit((editBuilder) => {
       for (const selection of activeTextEditor.selections) {
         const textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, base64Service.encode(textSelected));
+        editBuilder.replace(selection, urlService.encode(textSelected));
       }
     });
 
-    this.vscodeWindow.showInformationMessage("Selection encoded to Base64");
+    this.vscodeWindow.showInformationMessage("Selection URL encoded");
   }
 
   decode(): void {
@@ -35,10 +35,10 @@ export class Base64 {
     activeTextEditor.edit((editBuilder) => {
       for (const selection of activeTextEditor.selections) {
         const textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, base64Service.decode(textSelected));
+        editBuilder.replace(selection, urlService.decode(textSelected));
       }
     });
 
-    this.vscodeWindow.showInformationMessage("Selection decoded from Base64");
+    this.vscodeWindow.showInformationMessage("Selection URL decoded");
   }
 }

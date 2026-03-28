@@ -66,6 +66,16 @@
         "category": "gPassword",
         "command": "gpassword.JWT",
         "title": "JWT Decode"
+      },
+      {
+        "category": "gPassword",
+        "command": "gpassword.UrlEncode",
+        "title": "URL Encode"
+      },
+      {
+        "category": "gPassword",
+        "command": "gpassword.UrlDecode",
+        "title": "URL Decode"
       }
     ],
     "configuration": [
@@ -139,6 +149,11 @@
           "id": "passwordGenerator.salts",
           "name": "Salts Generator",
           "type": "webview"
+        },
+        {
+          "id": "passwordGenerator.url",
+          "name": "URL Encoder/Decoder",
+          "type": "webview"
         }
       ]
     },
@@ -177,6 +192,16 @@
         },
         {
           "command": "gpassword.JWT",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && editorHasSelection"
+        },
+        {
+          "command": "gpassword.UrlEncode",
+          "group": "gpassword",
+          "when": "editorTextFocus && !editorReadonly && editorHasSelection"
+        },
+        {
+          "command": "gpassword.UrlDecode",
           "group": "gpassword",
           "when": "editorTextFocus && !editorReadonly && editorHasSelection"
         },
@@ -264,7 +289,8 @@
     "base64",
     "basic auth",
     "jwt decode",
-    "WordPress Salt"
+    "WordPress Salt",
+    "url encode/decode"
   ],
   "license": "GPL-3.0-or-later",
   "main": "./out/extension.js",

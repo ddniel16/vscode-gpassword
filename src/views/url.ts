@@ -1,11 +1,11 @@
 import crypto from "node:crypto";
 import * as vscode from "vscode";
-import * as base64Service from "../services/base64";
+import * as urlService from "../services/url";
 
-export const BASE64_VIEW_ID = "passwordGenerator.base64";
+export const URL_VIEW_ID = "passwordGenerator.url";
 
-export class Base64ViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewId = BASE64_VIEW_ID;
+export class UrlViewProvider implements vscode.WebviewViewProvider {
+  public static readonly viewId = URL_VIEW_ID;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -21,7 +21,7 @@ export class Base64ViewProvider implements vscode.WebviewViewProvider {
       switch (type) {
         case "encode": {
           try {
-            const encoded = base64Service.encode(payload);
+            const encoded = urlService.encode(payload);
             webviewView.webview.postMessage({
               type: "result",
               payload: encoded,
@@ -36,7 +36,7 @@ export class Base64ViewProvider implements vscode.WebviewViewProvider {
         }
         case "decode": {
           try {
-            const decoded = base64Service.decode(payload);
+            const decoded = urlService.decode(payload);
             webviewView.webview.postMessage({
               type: "result",
               payload: decoded,
@@ -60,7 +60,7 @@ export class Base64ViewProvider implements vscode.WebviewViewProvider {
     });
 
     const styleUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, "media", "base64.css")
+      vscode.Uri.joinPath(this.context.extensionUri, "media", "url.css")
     );
 
     const nonce = crypto.randomBytes(16).toString("hex");
@@ -84,13 +84,13 @@ export class Base64ViewProvider implements vscode.WebviewViewProvider {
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="${csp}">
 <link rel="stylesheet" href="${styleUri}">
-<title>Base64 Encoder/Decoder</title>
+<title>URL Encoder/Decoder</title>
 </head>
 <body>
-<h2>Base64 Encoder/Decoder</h2>
+<h2>URL Encoder/Decoder</h2>
 
 <div class="container">
-  <textarea id="inputText" placeholder="Paste your text here to encode/decode..."></textarea>
+  <textarea id="inputText" placeholder="Paste your text here to URL encode/decode..."></textarea>
 
   <div class="button-group">
     <button id="encodeBtn" class="button">Encode</button>

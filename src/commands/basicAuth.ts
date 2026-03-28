@@ -1,31 +1,34 @@
+import * as vscode from "vscode";
 import bcrypt from "bcrypt";
 
 export class BasicAuth {
-  editorWindow: any;
+  vscodeWindow: typeof vscode.window;
 
-  constructor(editorWindow: any) {
-    this.editorWindow = editorWindow;
+  constructor(vscodeWindow: typeof vscode.window) {
+    this.vscodeWindow = vscodeWindow;
   }
 
-  /**
-   * Converts the currently selected text(s) in the active editor to Basic Auth format.
-   * Uses bcrypt to hash the selected text and replaces it in the editor.
-   * Shows an information message upon success or an error message if no editor is open.
-   */
-  passwordToHash(): void {
-    const activeTextEditor = this.editorWindow.activeTextEditor;
+  async passwordToHash(): Promise<void> {
+    const activeTextEditor = this.vscodeWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
-      this.editorWindow.showErrorMessage("No open editor");
+      this.vscodeWindow.showErrorMessage("No open editor");
       return;
     }
 
-    activeTextEditor.edit(function (editBuilder: any) {
-      for (const selection of activeTextEditor.selections) {
-        let textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, bcrypt.hashSync(textSelected, 10));
-      }
+    const selections = activeTextEditor.selections;
+    const hashes = await Promise.all(
+      selections.map((selection) => {
+        const text = activeTextEditor.document.getText(selection);
+        return bcrypt.hash(text, 10);
+      })
+    );
+
+    activeTextEditor.edit((editBuilder) => {
+      selections.forEach((selection, i) => {
+        editBuilder.replace(selection, hashes[i]);
+      });
     });
 
-    this.editorWindow.showInformationMessage("Password to Basic Auth");
+    this.vscodeWindow.showInformationMessage("Password to Basic Auth");
   }
 }

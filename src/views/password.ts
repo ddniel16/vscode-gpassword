@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import * as vscode from "vscode";
 
 import { PasswordsGenerator } from "../services/passwords";
@@ -73,7 +74,7 @@ export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider
     );
 
     // Nonce para permitir el script
-    const nonce = Date.now().toString(36);
+    const nonce = crypto.randomBytes(16).toString("hex");
 
     // CSP estricta sin inline no autorizado (solo style desde paquete y script con nonce)
     const csp = [

@@ -1,15 +1,17 @@
+import * as vscode from "vscode";
+import crypto from "node:crypto";
 import { type ExtensionConfig } from "../extensionConfig";
 import { PasswordsGenerator } from "../services/passwords";
 
 export class Passwords {
   randomLengthMin: number;
   randomLengthMax: number;
-  window: any;
+  vscodeWindow: typeof vscode.window;
 
-  constructor(window: any, $extConfig: ExtensionConfig) {
+  constructor(vscodeWindow: typeof vscode.window, $extConfig: ExtensionConfig) {
     this.randomLengthMin = $extConfig.randomLengthMin;
     this.randomLengthMax = $extConfig.randomLengthMax;
-    this.window = window;
+    this.vscodeWindow = vscodeWindow;
 
     if (this.randomLengthMin >= this.randomLengthMax) {
       throw new Error('The "Random Length Min" parameter is greater than the "Random Length Max"!');
@@ -18,7 +20,7 @@ export class Passwords {
 
   lettersGenerate(): void {
     const passwordGenerator = new PasswordsGenerator();
-    let password = passwordGenerator.generatePassword({
+    const password = passwordGenerator.generatePassword({
       numbers: false,
       symbols: false,
       uppercase: true,
@@ -31,7 +33,7 @@ export class Passwords {
 
   lettersNumbersGenerate(): void {
     const passwordGenerator = new PasswordsGenerator();
-    let password = passwordGenerator.generatePassword({
+    const password = passwordGenerator.generatePassword({
       numbers: true,
       symbols: false,
       uppercase: true,
@@ -44,7 +46,7 @@ export class Passwords {
 
   allCharactersGenerate(): void {
     const passwordGenerator = new PasswordsGenerator();
-    let password = passwordGenerator.generatePassword({
+    const password = passwordGenerator.generatePassword({
       numbers: true,
       symbols: true,
       uppercase: true,
@@ -56,23 +58,23 @@ export class Passwords {
   }
 
   private printPassword(password: string): void {
-    const activeTextEditor = this.window.activeTextEditor;
+    const activeTextEditor = this.vscodeWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
+      this.vscodeWindow.showErrorMessage("No open editor");
       return;
     }
 
     const selection = activeTextEditor.selection;
-    activeTextEditor.edit(function (editBuilder: any) {
+    activeTextEditor.edit((editBuilder) => {
       editBuilder.insert(selection.anchor, password);
     });
 
-    this.window.showInformationMessage("Password generated");
+    this.vscodeWindow.showInformationMessage("Password generated");
   }
 
   randomNumber(): number {
     const min = Math.ceil(this.randomLengthMin);
     const max = Math.floor(this.randomLengthMax);
-    return Math.floor(Math.random() * (max - min + 1) + min);
+    return crypto.randomInt(min, max + 1);
   }
 }

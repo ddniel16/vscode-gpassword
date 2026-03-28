@@ -1,4 +1,4 @@
-import * as crypto from "crypto";
+import crypto from "node:crypto";
 import * as vscode from "vscode";
 
 export const JWT_VIEW_ID = "passwordGenerator.jwt";
@@ -17,8 +17,6 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
-    console.log("Resolving JWT View");
-
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
@@ -64,7 +62,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
     );
 
     // Nonce para permitir el script
-    const nonce = Date.now().toString(36);
+    const nonce = crypto.randomBytes(16).toString("hex");
 
     // CSP estricta sin inline no autorizado (solo style desde paquete y script con nonce)
     const csp = [

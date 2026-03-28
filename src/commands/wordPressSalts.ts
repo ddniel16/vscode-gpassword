@@ -1,72 +1,42 @@
-import crypto from "crypto";
+import * as vscode from "vscode";
+import { generateWordPressSalts } from "../services/salts";
 
 export class WordPressSalts {
-  hashKeys: string[];
-  window: any;
+  vscodeWindow: typeof vscode.window;
 
-  constructor(window: any) {
-    this.window = window;
-    this.hashKeys = [
-      "AUTH_KEY",
-      "AUTH_SALT",
-      "LOGGED_IN_KEY",
-      "LOGGED_IN_SALT",
-      "NONCE_KEY",
-      "NONCE_SALT",
-      "SECURE_AUTH_KEY",
-      "SECURE_AUTH_SALT",
-    ];
+  constructor(vscodeWindow: typeof vscode.window) {
+    this.vscodeWindow = vscodeWindow;
   }
 
-  generateSalt(): string {
-    const excludeChars = ["'", '"', "\\"];
-    let salt = "";
-
-    while (salt.length < 64) {
-      const charCode = crypto.randomInt(33, 127);
-      const char = String.fromCharCode(charCode);
-      if (!excludeChars.includes(char)) {
-        salt += char;
-      }
-    }
-
-    return salt;
-  }
   generateYml(): void {
-    const activeTextEditor = this.window.activeTextEditor;
+    const activeTextEditor = this.vscodeWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
-      console.log("No open editor");
+      this.vscodeWindow.showErrorMessage("No open editor");
       return;
     }
 
-    let yml = this.hashKeys.map((key) => `${key}: "${this.generateSalt()}"`).join("\n");
-
+    const yml = generateWordPressSalts("yaml");
     const selection = activeTextEditor.selection;
-    activeTextEditor.edit(function (editBuilder: any) {
+    activeTextEditor.edit((editBuilder) => {
       editBuilder.insert(selection.anchor, yml);
     });
 
-    this.window.showInformationMessage("WordPress salts generated");
+    this.vscodeWindow.showInformationMessage("WordPress salts generated");
   }
 
   generateEnv(): void {
-    const activeTextEditor = this.window.activeTextEditor;
+    const activeTextEditor = this.vscodeWindow.activeTextEditor;
     if (activeTextEditor === undefined) {
-      this.window.showErrorMessage("No open editor");
-      console.log("No open editor");
+      this.vscodeWindow.showErrorMessage("No open editor");
       return;
     }
 
-    console.log();
-
-    let env = this.hashKeys.map((key) => `${key}='${this.generateSalt()}'`).join("\n");
-
+    const env = generateWordPressSalts("env");
     const selection = activeTextEditor.selection;
-    activeTextEditor.edit(function (editBuilder: any) {
+    activeTextEditor.edit((editBuilder) => {
       editBuilder.insert(selection.anchor, env);
     });
 
-    this.window.showInformationMessage("WordPress salts generated");
+    this.vscodeWindow.showInformationMessage("WordPress salts generated");
   }
 }
