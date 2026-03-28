@@ -31,7 +31,7 @@ code {
 
 textarea {
   width: 98%;
-  min-height: 90px;
+  min-height: 85px;
   font-family: var(--vscode-editor-font-family, monospace);
   resize: vertical;
   padding: .4rem;

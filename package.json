@@ -76,6 +76,11 @@
         "category": "gPassword",
         "command": "gpassword.UrlDecode",
         "title": "URL Decode"
+      },
+      {
+        "category": "gPassword",
+        "command": "gpassword.switchTool",
+        "title": "Switch Tool"
       }
     ],
     "configuration": [
@@ -100,8 +105,33 @@
         }
       },
       {
-        "title": "gPassword: Password Generator (Sidebar)",
+        "title": "gPassword: Sidebar",
         "order": 2,
+        "properties": {
+          "gpassword.defaultTool": {
+            "default": "base64",
+            "description": "Default tool to show in the sidebar when opening the extension",
+            "enum": [
+              "password",
+              "jwt",
+              "base64",
+              "salts",
+              "url"
+            ],
+            "enumItemLabels": [
+              "Password Generator",
+              "JWT Decoder & Validator",
+              "Base64 Encoder/Decoder",
+              "Salts Generator",
+              "URL Encoder/Decoder"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      {
+        "title": "gPassword: Password Generator (Sidebar)",
+        "order": 3,
         "properties": {
           "gpassword.passwordGeneratorLength": {
             "default": 20,
@@ -131,28 +161,12 @@
     "views": {
       "passwordGenerator": [
         {
-          "id": "passwordGenerator.password",
-          "name": "Password Generator",
-          "type": "webview"
+          "id": "passwordGenerator.navigator",
+          "name": "Tools selector"
         },
         {
-          "id": "passwordGenerator.jwt",
-          "name": "JWT Decoder & Validator",
-          "type": "webview"
-        },
-        {
-          "id": "passwordGenerator.base64",
-          "name": "Base64 Encoder/Decoder",
-          "type": "webview"
-        },
-        {
-          "id": "passwordGenerator.salts",
-          "name": "Salts Generator",
-          "type": "webview"
-        },
-        {
-          "id": "passwordGenerator.url",
-          "name": "URL Encoder/Decoder",
+          "id": "passwordGenerator.toolView",
+          "name": "Tool view",
           "type": "webview"
         }
       ]

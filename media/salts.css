@@ -27,7 +27,7 @@ h3 {
 
 textarea {
   width: 98%;
-  min-height: 200px;
+  min-height: 85px;
   padding: 8px;
   font-size: 12px;
   font-family: var(--vscode-editor-font-family, "Courier New", monospace);

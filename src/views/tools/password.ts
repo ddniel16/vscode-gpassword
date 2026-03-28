@@ -1,96 +1,80 @@
 import crypto from "node:crypto";
 import * as vscode from "vscode";
+import { PasswordsGenerator } from "../../services/passwords";
+import { EntropyCalculator } from "../../services/entropy";
+import type { ToolModule } from "./types";
 
-import { PasswordsGenerator } from "../services/passwords";
-import { EntropyCalculator } from "../services/entropy";
-export const PASSWORD_GENERATOR_VIEW_ID = "passwordGenerator.password";
+function handleMessage(webview: vscode.Webview): vscode.Disposable {
+  return webview.onDidReceiveMessage(async (msg) => {
+    const { type, payload } = msg;
 
-export class PasswordGeneratorViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewId = PASSWORD_GENERATOR_VIEW_ID;
+    switch (type) {
+      case "listGenerate": {
+        const passwordGenerator = new PasswordsGenerator();
+        const entropyCalculator = new EntropyCalculator();
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+        const listItems = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+        const listGenerate: {
+          id: string;
+          value: string;
+          entropy: {
+            theoreticalBits: number;
+            shannonBits: number;
+            score: string;
+          };
+        }[] = [];
 
-  resolveWebviewView(webviewView: vscode.WebviewView): void {
-    webviewView.webview.options = {
-      enableScripts: true,
-      // Restringimos a la carpeta media que contendrá assets estáticos empaquetados
-      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
-    };
+        listItems.forEach(() => {
+          const pwd = passwordGenerator.generatePassword(payload);
+          const entropy = entropyCalculator.calculateDetailedEntropy(pwd, payload);
+          listGenerate.push({ id: listItems[listGenerate.length], value: pwd, entropy });
+        });
 
-    webviewView.webview.onDidReceiveMessage(async (msg) => {
-      const { type, payload } = msg;
-
-      switch (type) {
-        case "listGenerate": {
-          const passwordGenerator = new PasswordsGenerator();
-          const entropyCalculator = new EntropyCalculator();
-
-          const listItems = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
-          let listGenerate: {
-            id: string;
-            value: string;
-            entropy: {
-              theoreticalBits: number;
-              shannonBits: number;
-              score: string;
-            };
-          }[] = [];
-
-          listItems.forEach((item, index) => {
-            const pwd = passwordGenerator.generatePassword(payload);
-            const entropy = entropyCalculator.calculateDetailedEntropy(pwd, payload);
-            listGenerate.push({ id: item, value: pwd, entropy: entropy });
-          });
-
-          webviewView.webview.postMessage({
-            type: "listGenerateMessage",
-            payload: listGenerate,
-          });
-          break;
-        }
-        case "copy": {
-          if (payload) {
-            await vscode.env.clipboard.writeText(payload);
-            vscode.window.showInformationMessage("Password copied to clipboard");
-          }
-          break;
-        }
+        webview.postMessage({
+          type: "listGenerateMessage",
+          payload: listGenerate,
+        });
+        break;
       }
-    });
+      case "copy": {
+        if (payload) {
+          await vscode.env.clipboard.writeText(payload);
+          vscode.window.showInformationMessage("Password copied to clipboard");
+        }
+        break;
+      }
+    }
+  });
+}
 
-    const cfg = vscode.workspace.getConfiguration("gpassword");
-    const settings = {
-      defaultLength: cfg.get<number>("passwordGeneratorLength", 20),
-      includeNumbers: cfg.get<boolean>("passwordGeneratorDefault.includeNumbers", true),
-      includeSymbols: cfg.get<boolean>("passwordGeneratorDefault.includeSymbols", true),
-      includeUppercase: cfg.get<boolean>("passwordGeneratorDefault.includeUppercase", true),
-      customChars: cfg.get<string>("passwordGeneratorDefault.customChars", ""),
-    };
-    const settingsJson = JSON.stringify(settings).replace(/</g, "\\u003c");
+function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
+  const cfg = vscode.workspace.getConfiguration("gpassword");
+  const settings = {
+    defaultLength: cfg.get<number>("passwordGeneratorLength", 20),
+    includeNumbers: cfg.get<boolean>("passwordGeneratorDefault.includeNumbers", true),
+    includeSymbols: cfg.get<boolean>("passwordGeneratorDefault.includeSymbols", true),
+    includeUppercase: cfg.get<boolean>("passwordGeneratorDefault.includeUppercase", true),
+    customChars: cfg.get<string>("passwordGeneratorDefault.customChars", ""),
+  };
+  const settingsJson = JSON.stringify(settings).replace(/</g, "\\u003c");
 
-    // URI al CSS externo
-    const styleUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, "media", "password.css")
-    );
+  const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "password.css"));
+  const nonce = crypto.randomBytes(16).toString("hex");
 
-    // Nonce para permitir el script
-    const nonce = crypto.randomBytes(16).toString("hex");
+  const csp = [
+    "default-src 'none'",
+    `style-src ${webview.cspSource}`,
+    `img-src ${webview.cspSource} data:`,
+    `font-src ${webview.cspSource}`,
+    `script-src 'nonce-${nonce}'`,
+    "connect-src 'none'",
+    "object-src 'none'",
+    "frame-src 'none'",
+    "base-uri 'none'",
+    "form-action 'none'",
+  ].join("; ");
 
-    // CSP estricta sin inline no autorizado (solo style desde paquete y script con nonce)
-    const csp = [
-      "default-src 'none'",
-      `style-src ${webviewView.webview.cspSource}`,
-      `img-src ${webviewView.webview.cspSource} data:`,
-      `font-src ${webviewView.webview.cspSource}`,
-      `script-src 'nonce-${nonce}'`,
-      "connect-src 'none'",
-      "object-src 'none'",
-      "frame-src 'none'",
-      "base-uri 'none'",
-      "form-action 'none'",
-    ].join("; ");
-
-    webviewView.webview.html = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -213,7 +197,7 @@ window.addEventListener('message', (event) => {
 });
 </script>
 </body>
-</html>
-    `;
-  }
+</html>`;
 }
+
+export const passwordTool: ToolModule = { getHtml, handleMessage };

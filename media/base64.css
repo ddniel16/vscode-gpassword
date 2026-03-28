@@ -20,7 +20,7 @@ h2 {
 
 textarea {
   width: 98%;
-  min-height: 150px;
+  min-height: 85px;
   padding: 8px;
   font-size: 13px;
   font-family: var(--vscode-editor-font-family, "Courier New", monospace);

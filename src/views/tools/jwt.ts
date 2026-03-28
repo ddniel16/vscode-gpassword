@@ -1,84 +1,69 @@
 import crypto from "node:crypto";
 import * as vscode from "vscode";
+import type { ToolModule } from "./types";
 
-export const JWT_VIEW_ID = "passwordGenerator.jwt";
-
-export class JWTViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewId = JWT_VIEW_ID;
-
-  constructor(private readonly context: vscode.ExtensionContext) {}
-
-  private base64urlDecode(str: string): Buffer {
-    str = str.replace(/-/g, "+").replace(/_/g, "/");
-    while (str.length % 4) {
-      str += "=";
-    }
-    return Buffer.from(str, "base64");
+function base64urlDecode(str: string): Buffer {
+  str = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (str.length % 4) {
+    str += "=";
   }
+  return Buffer.from(str, "base64");
+}
 
-  resolveWebviewView(webviewView: vscode.WebviewView): void {
-    webviewView.webview.options = {
-      enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
-    };
+function handleMessage(webview: vscode.Webview): vscode.Disposable {
+  return webview.onDidReceiveMessage(async (msg) => {
+    const { type, payload } = msg;
 
-    webviewView.webview.onDidReceiveMessage(async (msg) => {
-      const { type, payload } = msg;
+    switch (type) {
+      case "verify": {
+        try {
+          const [jwtHeader, jwtPayload, jwtSignature] = payload.jwt.split(".");
+          const signature = base64urlDecode(jwtSignature);
 
-      switch (type) {
-        case "verify": {
-          try {
-            const [jwtHeader, jwtPayload, jwtSignature] = payload.jwt.split(".");
-            const signature = this.base64urlDecode(jwtSignature);
+          const datos = `${jwtHeader}.${jwtPayload}`;
+          const expectedSignature = crypto.createHmac("sha256", payload.secret).update(datos).digest();
 
-            const datos = `${jwtHeader}.${jwtPayload}`;
-            const expectedSignature = crypto.createHmac("sha256", payload.secret).update(datos).digest();
-
-            if (!crypto.timingSafeEqual(signature, expectedSignature)) {
-              throw new Error("Invalid signature");
-            }
-
-            webviewView.webview.postMessage({
-              type: "verifyResult",
-              success: true,
-              message: "JWT is valid",
-            });
-          } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : String(error);
-            webviewView.webview.postMessage({
-              type: "verifyResult",
-              success: false,
-              message: errorMsg,
-            });
+          if (!crypto.timingSafeEqual(signature, expectedSignature)) {
+            throw new Error("Invalid signature");
           }
-          break;
+
+          webview.postMessage({
+            type: "verifyResult",
+            success: true,
+            message: "JWT is valid",
+          });
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          webview.postMessage({
+            type: "verifyResult",
+            success: false,
+            message: errorMsg,
+          });
         }
+        break;
       }
-    });
+    }
+  });
+}
 
-    // URI al CSS externo
-    const styleUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, "media", "jwt.css")
-    );
+function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
+  const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "jwt.css"));
+  const nonce = crypto.randomBytes(16).toString("hex");
 
-    // Nonce para permitir el script
-    const nonce = crypto.randomBytes(16).toString("hex");
+  const csp = [
+    "default-src 'none'",
+    `style-src ${webview.cspSource}`,
+    `img-src ${webview.cspSource} data:`,
+    `font-src ${webview.cspSource}`,
+    `script-src 'nonce-${nonce}'`,
+    "connect-src 'none'",
+    "object-src 'none'",
+    "frame-src 'none'",
+    "base-uri 'none'",
+    "form-action 'none'",
+  ].join("; ");
 
-    // CSP estricta sin inline no autorizado (solo style desde paquete y script con nonce)
-    const csp = [
-      "default-src 'none'",
-      `style-src ${webviewView.webview.cspSource}`,
-      `img-src ${webviewView.webview.cspSource} data:`,
-      `font-src ${webviewView.webview.cspSource}`,
-      `script-src 'nonce-${nonce}'`,
-      "connect-src 'none'",
-      "object-src 'none'",
-      "frame-src 'none'",
-      "base-uri 'none'",
-      "form-action 'none'",
-    ].join("; ");
-
-    webviewView.webview.html = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
   <html lang="en">
   <head>
   <meta charset="UTF-8">
@@ -147,7 +132,6 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
       const decodedHeader = JSON.parse(atob(header));
       element('jwt-header').textContent = JSON.stringify(decodedHeader, null, 2);
 
-      // Mostrar sección de verificación solo si es HS256
       if (decodedHeader.alg === 'HS256') {
         document.querySelector('.verify').classList.remove('hidden');
       } else {
@@ -200,7 +184,7 @@ export class JWTViewProvider implements vscode.WebviewViewProvider {
 
   </script>
   </body>
-  </html>
-    `;
-  }
+  </html>`;
 }
+
+export const jwtTool: ToolModule = { getHtml, handleMessage };

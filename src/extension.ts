@@ -4,18 +4,15 @@ import { workspace, window, commands, type ExtensionContext } from "vscode";
 import { Base64 } from "./commands/base64";
 import { BasicAuth } from "./commands/basicAuth";
 import { Passwords } from "./commands/passwords";
-import { ExtensionConfig } from "./extensionConfig";
+import { ExtensionConfig, type ToolId } from "./extensionConfig";
 import { WordPressSalts } from "./commands/wordPressSalts";
 import { JWT } from "./commands/jwt";
 import { Strapi } from "./commands/strapi";
 import { Url } from "./commands/url";
 
 // Import views
-import { PasswordGeneratorViewProvider } from "./views/password";
-import { JWTViewProvider } from "./views/jwt";
-import { Base64ViewProvider } from "./views/base64";
-import { SaltsViewProvider } from "./views/salts";
-import { UrlViewProvider } from "./views/url";
+import { NavigatorProvider } from "./views/navigator";
+import { ToolViewProvider } from "./views/toolView";
 
 export const extConfig: ExtensionConfig = {} as ExtensionConfig;
 
@@ -124,26 +121,21 @@ export function activate(context: ExtensionContext) {
 
   // * Register views
 
-  // Password Generator
+  const defaultTool = workspace.getConfiguration("gpassword").get<ToolId>("defaultTool", "base64");
+
+  const navigatorProvider = new NavigatorProvider(defaultTool);
+  const toolViewProvider = new ToolViewProvider(context, defaultTool);
+
+  context.subscriptions.push(window.registerTreeDataProvider(NavigatorProvider.viewId, navigatorProvider));
+
+  context.subscriptions.push(window.registerWebviewViewProvider(ToolViewProvider.viewId, toolViewProvider));
+
   context.subscriptions.push(
-    window.registerWebviewViewProvider(PasswordGeneratorViewProvider.viewId, new PasswordGeneratorViewProvider(context))
+    commands.registerCommand("gpassword.switchTool", (toolId: ToolId) => {
+      navigatorProvider.setActiveTool(toolId);
+      toolViewProvider.switchTool(toolId);
+    })
   );
-
-  // JWT Generator
-  context.subscriptions.push(window.registerWebviewViewProvider(JWTViewProvider.viewId, new JWTViewProvider(context)));
-
-  // Base64 Encoder/Decoder
-  context.subscriptions.push(
-    window.registerWebviewViewProvider(Base64ViewProvider.viewId, new Base64ViewProvider(context))
-  );
-
-  // Salts Generator
-  context.subscriptions.push(
-    window.registerWebviewViewProvider(SaltsViewProvider.viewId, new SaltsViewProvider(context))
-  );
-
-  // URL Encoder/Decoder
-  context.subscriptions.push(window.registerWebviewViewProvider(UrlViewProvider.viewId, new UrlViewProvider(context)));
 }
 
 export function deactivate(): void {}
