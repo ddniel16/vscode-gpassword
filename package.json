@@ -323,7 +323,8 @@
     "pretest": "npm run compile && npm run lint",
     "test": "vscode-test",
     "vscode:prepublish": "npm run compile",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "postversion": "git push && git push --tags"
   },
   "version": "0.2.1"
 }
