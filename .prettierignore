@@ -10,3 +10,4 @@ node_modules/
 
 # Archivos de configuración de paquetes
 package-lock.json
+pnpm-lock.yaml
