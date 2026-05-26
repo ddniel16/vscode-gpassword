@@ -1,0 +1,32 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Install dependencies
+        run: pnpm ci
+
+      - name: Run linter
+        run: node --run lint
+
+      - name: Run formatter
+        run: node --run format
+
+      - name: Run compile
+        run: node --run compile
