@@ -1,7 +1,5 @@
 # gPassword & Encoder Tools
 
-[![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/i/ddniel16.gpassword.svg)](https://marketplace.visualstudio.com/items?itemName=ddniel16.gpassword)
-
 ## Instalación
 
 Con Visual Studio Code abierto, lanza la búsqueda rápida (Ctrl+P), pega el siguiente comando y presiona enter.

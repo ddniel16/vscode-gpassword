@@ -321,5 +321,5 @@
     "vscode:prepublish": "node --run compile",
     "watch": "node esbuild.mjs --watch"
   },
-  "version": "0.2.2"
+  "version": "0.3.0"
 }
