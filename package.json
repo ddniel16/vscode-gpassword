@@ -301,7 +301,7 @@
   "license": "GPL-3.0-or-later",
   "main": "./out/extension.js",
   "name": "gpassword",
-  "packageManager": "pnpm@11.3.0",
+  "packageManager": "pnpm@11.4.0",
   "pricing": "Free",
   "publisher": "ddniel16",
   "repository": {
