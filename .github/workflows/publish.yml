@@ -6,12 +6,12 @@ permissions:
 on:
   push:
     tags:
-      - "*.*.*"
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   package:
     if: github.event.base_ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
-    name: Package and Publish Extension
+    name: Package Extension
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,7 +24,7 @@ jobs:
 
       - uses: pnpm/action-setup@v6
         with:
-          version: 11
+          package_json_file: package.json
 
       - name: Install dependencies
         run: pnpm ci
@@ -41,7 +41,6 @@ jobs:
             echo "VSIX file not found" >&2
             exit 1
           fi
-          echo "VSIX_FILE=$FILE" >> $GITHUB_ENV
           echo "vsix_file=$FILE" >> $GITHUB_OUTPUT
           echo "Found: $FILE"
 
@@ -53,8 +52,30 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  publish:
+    name: Publish Extension
+    needs: package
+    runs-on: ubuntu-latest
+    environment: Publish Extension
+    steps:
+      - name: Descargar artefacto VSIX
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-${{ github.ref_name }}
+
+      - name: Find VSIX file
+        id: find_vsix
+        run: |
+          set -euo pipefail
+          FILE=$(ls *.vsix | head -n 1 || true)
+          if [ -z "$FILE" ]; then
+            echo "VSIX file not found" >&2
+            exit 1
+          fi
+          echo "VSIX_FILE=$FILE" >> $GITHUB_ENV
+          echo "Found: $FILE"
+
       - name: Publish to VS Code Marketplace
-        if: success()
         env:
           VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
         run: |
@@ -67,7 +88,6 @@ jobs:
           pnpx @vscode/vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
 
       - name: Publish to Open VSX
-        if: success()
         env:
           OVSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
         run: |
