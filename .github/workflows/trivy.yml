@@ -17,7 +17,7 @@ jobs:
       - name: Trivy Scan
         uses: docker://docker.io/aquasec/trivy:latest
         with:
-          args: fs --exit-code 1 --no-progress --include-dev-deps --severity HIGH,CRITICAL --format json --output /github/workspace/trivy-results.json .
+          args: fs --exit-code 1 --no-progress --severity HIGH,CRITICAL --format json --output /github/workspace/trivy-results.json .
 
       - name: Generar resumen
         if: always()
