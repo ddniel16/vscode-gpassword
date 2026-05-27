@@ -15,23 +15,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          # Necesario para obtener todos los tags y commits
-          fetch-depth: 0
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
+          node-version-file: .node-version
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
 
       - name: Install dependencies
-        run: |
-          npm ci --no-audit --no-fund
-          npm install --global @vscode/vsce@latest ovsx@latest
+        run: pnpm ci
 
       - name: Package the extension
-        run: vsce package
+        run: pnpx @vscode/vsce package --no-dependencies
 
       - name: Find VSIX file
         id: find_vsix
@@ -65,7 +64,7 @@ jobs:
             exit 0
           fi
           echo "Publicando en VS Code Marketplace..."
-          npx vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
+          pnpx @vscode/vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
 
       - name: Publish to Open VSX
         if: success()
@@ -78,4 +77,4 @@ jobs:
             exit 0
           fi
           echo "Publicando en Open VSX..."
-          npx ovsx publish "$VSIX_FILE" --pat "$OVSX_TOKEN"
+          pnpx ovsx@latest publish "$VSIX_FILE" --pat "$OVSX_TOKEN"

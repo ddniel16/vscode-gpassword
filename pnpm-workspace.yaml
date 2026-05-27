@@ -1,0 +1,5 @@
+allowBuilds:
+  "@vscode/vsce-sign": false
+  bcrypt: false
+  esbuild: true
+  keytar: false

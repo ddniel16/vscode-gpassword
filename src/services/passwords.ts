@@ -17,7 +17,7 @@ export class PasswordsGenerator {
   /**
    * Returns a new shuffled array, leaving the original array unmodified.
    */
-  private shuffle(array: any[]): any[] {
+  private shuffle(array: string[]): string[] {
     const arr = array.slice(); // create a copy
     for (let i = arr.length - 1; i > 0; i--) {
       const j = this.randomIntSecure(i + 1);

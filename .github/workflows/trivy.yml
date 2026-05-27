@@ -1,0 +1,70 @@
+name: Trivy Scan
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+  pull_request:
+
+jobs:
+  trivy-scan:
+    name: Trivy Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Trivy Scan
+        uses: docker://docker.io/aquasec/trivy:latest
+        with:
+          args: fs --exit-code 1 --no-progress --severity HIGH,CRITICAL --format json --output /github/workspace/trivy-results.json .
+
+      - name: Generar resumen
+        if: always()
+        run: |
+          if [ ! -f trivy-results.json ]; then
+            echo "No se encontró el archivo de resultados de Trivy. :shipit:" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          VULNS=$(jq '
+            [.Results[]? | . as $result |
+              ([$result.Packages[]? | {key: (.Name + "@" + .Version), value: .}] | from_entries) as $pkgs |
+              $result.Vulnerabilities[]? |
+              ($pkgs[.PkgName + "@" + .InstalledVersion] // {}) as $pkg |
+              {
+                pkg: .PkgName,
+                version: .InstalledVersion,
+                id: .VulnerabilityID,
+                tipo: (
+                  if $pkg.Relationship == "direct" then
+                    (if $pkg.Dev then "devDependency" else "dependency" end)
+                  else
+                    "indirecta"
+                  end
+                )
+              }
+            ]' trivy-results.json)
+          COUNT=$(echo "$VULNS" | jq 'length')
+
+          if [ "$COUNT" -eq 0 ]; then
+            echo "### ✅ No se detectaron vulnerabilidades" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "### ⚠️ Vulnerabilidades detectadas ($COUNT) :goberserk:" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Paquete | Versión | Tipo | Vulnerabilidad |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---------|---------|------|----------------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "$VULNS" | jq -r '.[] | "| \(.pkg) | \(.version) | \(.tipo) | \(.id) |"' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verificar resultado de Trivy
+        if: always()
+        run: |
+          if [ -f trivy-results.json ]; then
+            COUNT=$(jq '[.Results[]? | select(.Vulnerabilities != null) | .Vulnerabilities[]] | length' trivy-results.json)
+            if [ "$COUNT" -gt 0 ]; then
+              echo "::error::Se detectaron ($COUNT) vulnerabilidades HIGH/CRITICAL"
+              exit 1
+            fi
+          fi
