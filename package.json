@@ -85,7 +85,6 @@
     ],
     "configuration": [
       {
-        "title": "gPassword: General",
         "order": 1,
         "properties": {
           "gpassword.randomLengthMax": {
@@ -102,10 +101,10 @@
             "minimum": 15,
             "type": "integer"
           }
-        }
+        },
+        "title": "gPassword: General"
       },
       {
-        "title": "gPassword: Sidebar",
         "order": 2,
         "properties": {
           "gpassword.defaultTool": {
@@ -127,19 +126,12 @@
             ],
             "type": "string"
           }
-        }
+        },
+        "title": "gPassword: Sidebar"
       },
       {
-        "title": "gPassword: Password Generator (Sidebar)",
         "order": 3,
         "properties": {
-          "gpassword.passwordGeneratorLength": {
-            "default": 20,
-            "description": "Default length for password generator",
-            "maximum": 55,
-            "minimum": 10,
-            "type": "integer"
-          },
           "gpassword.passwordGeneratorDefault.includeNumbers": {
             "default": true,
             "description": "Include numbers in password",
@@ -154,32 +146,18 @@
             "default": true,
             "description": "Include uppercase letters in password",
             "type": "boolean"
+          },
+          "gpassword.passwordGeneratorLength": {
+            "default": 20,
+            "description": "Default length for password generator",
+            "maximum": 55,
+            "minimum": 10,
+            "type": "integer"
           }
-        }
+        },
+        "title": "gPassword: Password Generator (Sidebar)"
       }
     ],
-    "views": {
-      "passwordGenerator": [
-        {
-          "id": "passwordGenerator.navigator",
-          "name": "Tools selector"
-        },
-        {
-          "id": "passwordGenerator.toolView",
-          "name": "Tool view",
-          "type": "webview"
-        }
-      ]
-    },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "icon": "media/lock.svg",
-          "id": "passwordGenerator",
-          "title": "gPassword & Encoder Tools"
-        }
-      ]
-    },
     "menus": {
       "editor/context": [
         {
@@ -261,17 +239,39 @@
         "id": "gpassword.submenu",
         "label": "gPassword"
       }
-    ]
+    ],
+    "views": {
+      "passwordGenerator": [
+        {
+          "id": "passwordGenerator.navigator",
+          "name": "Tools selector"
+        },
+        {
+          "id": "passwordGenerator.toolView",
+          "name": "Tool view",
+          "type": "webview"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "icon": "media/lock.svg",
+          "id": "passwordGenerator",
+          "title": "gPassword & Encoder Tools"
+        }
+      ]
+    }
   },
   "dependencies": {
-    "bcrypt": "^6.0.0"
+    "bcryptjs": "^3.0.3"
   },
   "description": "Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.",
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.120.0",
     "@vscode/vsce": "^3.9.1",
+    "esbuild": "^0.28.0",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
@@ -301,24 +301,25 @@
   "license": "GPL-3.0-or-later",
   "main": "./out/extension.js",
   "name": "gpassword",
+  "packageManager": "pnpm@11.3.0",
   "pricing": "Free",
   "publisher": "ddniel16",
   "repository": {
     "type": "git",
     "url": "https://github.com/ddniel16/vscode-gpassword"
   },
-  "packageManager": "pnpm@11.3.0",
   "scripts": {
-    "compile": "tsc -p ./",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
+    "compile": "node esbuild.mjs",
+    "compile:types": "tsc -p ./ --noEmit",
     "format": "prettier --check \"src/**/*.ts\" \"*.json\" \"*.mjs\"",
     "format:fix": "prettier --write \"src/**/*.ts\" \"*.json\" \"*.mjs\"",
-    "pretest": "node --run lint && node --run format && node --run compile",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "postversion": "git push && git push --tags",
+    "pretest": "node --run lint && node --run format && node --run compile:types",
     "test": "vscode-test",
     "vscode:prepublish": "node --run compile",
-    "watch": "tsc -watch -p ./",
-    "postversion": "git push && git push --tags"
+    "watch": "node esbuild.mjs --watch"
   },
   "version": "0.2.2"
 }

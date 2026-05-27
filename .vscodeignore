@@ -8,6 +8,9 @@
 .gitignore
 .editorconfig
 eslint.config.mjs
+esbuild.mjs
+pnpm-lock.yaml
+pnpm-workspace.yaml
 
 # Archivos de configuración de TypeScript y ESLint
 **/tsconfig.json
@@ -17,6 +20,9 @@ eslint.config.mjs
 src/**
 **/*.ts
 **/*.map
+
+# Dependencias (se bundlea todo con esbuild)
+node_modules/**
 
 # Otros archivos de pruebas
 **/*.test.*
