@@ -27,13 +27,10 @@ jobs:
           version: 11
 
       - name: Install dependencies
-        run: |
-          pnpm ci
-          pnpm add --global @vscode/vsce@latest ovsx@latest
+        run: pnpm ci
 
       - name: Package the extension
-        # run: vsce package --no-dependencies
-        run: pnpm exec vsce package --no-dependencies
+        run: pnpx @vscode/vsce package --no-dependencies
 
       - name: Find VSIX file
         id: find_vsix
@@ -67,7 +64,7 @@ jobs:
             exit 0
           fi
           echo "Publicando en VS Code Marketplace..."
-          npx vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
+          pnpx @vscode/vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
 
       - name: Publish to Open VSX
         if: success()
@@ -80,4 +77,4 @@ jobs:
             exit 0
           fi
           echo "Publicando en Open VSX..."
-          npx ovsx publish "$VSIX_FILE" --pat "$OVSX_TOKEN"
+          pnpx ovsx@latest publish "$VSIX_FILE" --pat "$OVSX_TOKEN"
