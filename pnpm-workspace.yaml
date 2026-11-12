@@ -3,3 +3,4 @@ allowBuilds:
   bcrypt: false
   esbuild: true
   keytar: false
+trustPolicy: "off"

@@ -268,15 +268,15 @@
   },
   "description": "Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.",
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/vscode": "^1.120.0",
-    "@vscode/vsce": "^3.9.1",
-    "esbuild": "^0.28.0",
-    "eslint": "^10.0.0",
+    "@types/node": "^22.20.5",
+    "@types/vscode": "^1.145.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.8.1",
-    "typescript": "^6.0.0",
-    "typescript-eslint": "^8.0.0"
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1"
   },
   "displayName": "Generator password & Encoder Tools",
   "engines": {
@@ -301,7 +301,7 @@
   "license": "GPL-3.0-or-later",
   "main": "./out/extension.js",
   "name": "gpassword",
-  "packageManager": "pnpm@11.4.0",
+  "packageManager": "pnpm@12.18.0",
   "pricing": "Free",
   "publisher": "ddniel16",
   "repository": {
