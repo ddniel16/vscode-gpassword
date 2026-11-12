@@ -27,7 +27,7 @@ const buildOptions = {
   external: ["vscode"],
   format: "cjs",
   platform: "node",
-  target: "node22",
+  target: "node24",
   sourcemap: true,
   minify: !isWatch,
   plugins: isWatch ? [notifyPlugin] : [],

@@ -268,19 +268,20 @@
   },
   "description": "Generator password & Encoder Tools is a one-stop solution for strong password generation and encoding tools.",
   "devDependencies": {
-    "@types/node": "^22.20.5",
-    "@types/vscode": "^1.145.0",
-    "@vscode/vsce": "^3.9.2",
+    "@types/node": "^24.19.2",
+    "@types/vscode": "1.140.0",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "@vscode/vsce": "^4.1.0",
     "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.10",
-    "typescript": "^6.0.3",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
     "typescript-eslint": "^8.72.1"
   },
   "displayName": "Generator password & Encoder Tools",
   "engines": {
-    "vscode": "^1.120.0"
+    "vscode": "^1.140.0"
   },
   "galleryBanner": {
     "color": "#0C4A6E",
@@ -311,13 +312,14 @@
   "scripts": {
     "compile": "node esbuild.mjs",
     "compile:types": "tsc -p ./ --noEmit",
-    "format": "prettier --check \"src/**/*.ts\" \"*.json\" \"*.mjs\"",
-    "format:fix": "prettier --write \"src/**/*.ts\" \"*.json\" \"*.mjs\"",
+    "format": "prettier --check \"src/**/*.ts\" \"test/**/*.mjs\" \"*.json\" \"*.mjs\"",
+    "format:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.mjs\" \"*.json\" \"*.mjs\"",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "postversion": "git push && git push --tags",
     "pretest": "node --run lint && node --run format && node --run compile:types",
-    "test": "vscode-test",
+    "test": "node --test test/services.test.mjs",
+    "test:integration": "node --run compile && node test/run-vscode.mjs",
     "vscode:prepublish": "node --run compile",
     "watch": "node esbuild.mjs --watch"
   },
