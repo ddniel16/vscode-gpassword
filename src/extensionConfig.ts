@@ -1,4 +1,4 @@
-export type ToolId = "password" | "jwt" | "base64" | "salts" | "url";
+export type ToolId = "password" | "jwt" | "base64" | "salts" | "url" | "basicAuth";
 
 interface ExtensionConfigType {
   randomLengthMin: number;

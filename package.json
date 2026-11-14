@@ -115,14 +115,16 @@
               "jwt",
               "base64",
               "salts",
-              "url"
+              "url",
+              "basicAuth"
             ],
             "enumItemLabels": [
               "Password Generator",
               "JWT Decoder & Validator",
               "Base64 Encoder/Decoder",
               "Salts Generator",
-              "URL Encoder/Decoder"
+              "URL Encoder/Decoder",
+              "Basic Auth"
             ],
             "type": "string"
           }
@@ -318,7 +320,7 @@
     "lint:fix": "eslint src/ --fix",
     "postversion": "git push && git push --tags",
     "pretest": "node --run lint && node --run format && node --run compile:types",
-    "test": "node --test test/services.test.mjs",
+    "test": "node --test test/services.test.mjs test/basicAuth.test.mjs",
     "test:integration": "node --run compile && node test/run-vscode.mjs",
     "vscode:prepublish": "node --run compile",
     "watch": "node esbuild.mjs --watch"

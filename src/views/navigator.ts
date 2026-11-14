@@ -13,6 +13,7 @@ const TOOLS: readonly ToolDefinition[] = [
   { id: "base64", label: "Base64 Encoder/Decoder", icon: "file-binary" },
   { id: "salts", label: "Salts Generator", icon: "shield" },
   { id: "url", label: "URL Encoder/Decoder", icon: "link" },
+  { id: "basicAuth", label: "Basic Auth", icon: "lock" },
 ] as const;
 
 export class ToolItem extends vscode.TreeItem {

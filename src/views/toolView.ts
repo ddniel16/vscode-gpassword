@@ -3,6 +3,7 @@ import type { ToolId } from "../extensionConfig";
 import type { ToolModule } from "./tools/types";
 
 import { base64Tool } from "./tools/base64";
+import { basicAuthTool } from "./tools/basicAuth";
 import { jwtTool } from "./tools/jwt";
 import { passwordTool } from "./tools/password";
 import { saltsTool } from "./tools/salts";
@@ -12,6 +13,7 @@ export type { ToolModule };
 
 const TOOL_REGISTRY: Record<ToolId, ToolModule> = {
   base64: base64Tool,
+  basicAuth: basicAuthTool,
   jwt: jwtTool,
   password: passwordTool,
   salts: saltsTool,
