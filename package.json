@@ -103,7 +103,7 @@
         "order": 2,
         "properties": {
           "gpassword.defaultTool": {
-            "default": "base64",
+            "default": "password",
             "description": "Default tool to show in the sidebar when opening the extension",
             "enum": [
               "password",

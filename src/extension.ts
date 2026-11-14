@@ -15,23 +15,15 @@ import { ToolViewProvider } from "./views/toolView";
 
 export const extConfig: ExtensionConfig = {} as ExtensionConfig;
 
+function getDefaultTool(): ToolId {
+  return workspace.getConfiguration("gpassword").get<ToolId>("defaultTool", "password");
+}
+
 export function activate(context: ExtensionContext) {
   const config = workspace.getConfiguration().get("gpassword");
   if (config) {
     Object.assign(extConfig, config);
   }
-
-  // Reactive config: update extConfig when settings change
-  context.subscriptions.push(
-    workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration("gpassword")) {
-        const updated = workspace.getConfiguration().get("gpassword");
-        if (updated) {
-          Object.assign(extConfig, updated);
-        }
-      }
-    })
-  );
 
   // * Register commands
 
@@ -113,18 +105,65 @@ export function activate(context: ExtensionContext) {
 
   // * Register views
 
-  const defaultTool = workspace.getConfiguration("gpassword").get<ToolId>("defaultTool", "base64");
+  const defaultTool = getDefaultTool();
 
   const navigatorProvider = new NavigatorProvider(defaultTool);
-  const toolViewProvider = new ToolViewProvider(context, defaultTool);
+  const navigatorView = window.createTreeView(NavigatorProvider.viewId, { treeDataProvider: navigatorProvider });
+  context.subscriptions.push(navigatorView);
 
-  context.subscriptions.push(window.registerTreeDataProvider(NavigatorProvider.viewId, navigatorProvider));
+  let selectionUpdate = Promise.resolve();
+  const syncSelection = () => {
+    selectionUpdate = selectionUpdate
+      .then(async () => {
+        if (navigatorView.visible) {
+          await navigatorView.reveal(navigatorProvider.getActiveItem(), { select: true, focus: true });
+        }
+      })
+      .catch((error: unknown) => {
+        window.showErrorMessage(
+          `Could not update the active tool selection: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
+      });
+  };
+  const setActiveTool = (toolId: ToolId) => {
+    navigatorProvider.setActiveTool(toolId);
+    syncSelection();
+  };
+  context.subscriptions.push(
+    navigatorView.onDidChangeVisibility(({ visible }) => {
+      if (visible) {
+        syncSelection();
+      }
+    })
+  );
+
+  const toolViewProvider = new ToolViewProvider(context, defaultTool, () => {
+    const configuredTool = getDefaultTool();
+    setActiveTool(configuredTool);
+    return configuredTool;
+  });
+
+  context.subscriptions.push(
+    workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("gpassword")) {
+        const updated = workspace.getConfiguration().get("gpassword");
+        if (updated) {
+          Object.assign(extConfig, updated);
+        }
+        if (e.affectsConfiguration("gpassword.defaultTool")) {
+          const configuredTool = getDefaultTool();
+          setActiveTool(configuredTool);
+          toolViewProvider.switchTool(configuredTool);
+        }
+      }
+    })
+  );
 
   context.subscriptions.push(window.registerWebviewViewProvider(ToolViewProvider.viewId, toolViewProvider));
 
   context.subscriptions.push(
     commands.registerCommand("gpassword.switchTool", (toolId: ToolId) => {
-      navigatorProvider.setActiveTool(toolId);
+      setActiveTool(toolId);
       toolViewProvider.switchTool(toolId);
     })
   );

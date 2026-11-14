@@ -68,6 +68,7 @@ Puedes personalizar la configuración de la extensión a tu gusto. Algunas de la
   - `gpassword.randomLengthMin`: Mínimo de caracteres (entre 15 y 54)
   - `gpassword.randomLengthMax`: Máximo de caracteres (entre 16 y 55)
 - Sidebar
+  - `gpassword.defaultTool`: Herramienta que se selecciona por defecto al abrir el sidebar (`password` por defecto). Se guarda en la configuración de VS Code y cambiar de herramienta desde el sidebar no modifica este ajuste.
   - `gpassword.passwordGeneratorLength`: Longitud por defecto de la contraseña generada (20 por defecto)
   - `gpassword.passwordGeneratorIncludeNumbers`: Incluir números en la contraseña generada
   - `gpassword.passwordGeneratorIncludeSymbols`: Incluir símbolos en la contraseña generada

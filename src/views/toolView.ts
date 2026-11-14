@@ -25,11 +25,13 @@ export class ToolViewProvider implements vscode.WebviewViewProvider {
 
   private _webviewView: vscode.WebviewView | undefined;
   private _messageDisposable: vscode.Disposable | undefined;
+  private _visibilityDisposable: vscode.Disposable | undefined;
   private _currentTool: ToolId;
 
   constructor(
     private readonly context: vscode.ExtensionContext,
-    defaultTool: ToolId
+    defaultTool: ToolId,
+    private readonly onDidBecomeVisible: () => ToolId
   ) {
     this._currentTool = defaultTool;
   }
@@ -41,10 +43,19 @@ export class ToolViewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, "media")],
     };
 
+    this._visibilityDisposable?.dispose();
+    this._visibilityDisposable = webviewView.onDidChangeVisibility(() => {
+      if (webviewView.visible) {
+        this.switchTool(this.onDidBecomeVisible());
+      }
+    });
+
     webviewView.onDidDispose(() => {
       this._webviewView = undefined;
       this._messageDisposable?.dispose();
       this._messageDisposable = undefined;
+      this._visibilityDisposable?.dispose();
+      this._visibilityDisposable = undefined;
     });
 
     this._renderTool(this._currentTool);

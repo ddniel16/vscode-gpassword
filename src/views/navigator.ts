@@ -24,6 +24,7 @@ export class ToolItem extends vscode.TreeItem {
     active: boolean
   ) {
     super(label, vscode.TreeItemCollapsibleState.None);
+    this.id = toolId;
     this.iconPath = new vscode.ThemeIcon(icon);
     this.command = {
       command: "gpassword.switchTool",
@@ -39,11 +40,13 @@ export class NavigatorProvider implements vscode.TreeDataProvider<ToolItem> {
   public static readonly viewId = "passwordGenerator.navigator";
 
   private _activeTool: ToolId;
+  private readonly _items: ToolItem[];
   private _onDidChangeTreeData = new vscode.EventEmitter<ToolItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   constructor(defaultTool: ToolId) {
     this._activeTool = defaultTool;
+    this._items = TOOLS.map((tool) => new ToolItem(tool.id, tool.label, tool.icon, tool.id === defaultTool));
   }
 
   get activeTool(): ToolId {
@@ -51,15 +54,39 @@ export class NavigatorProvider implements vscode.TreeDataProvider<ToolItem> {
   }
 
   setActiveTool(toolId: ToolId): void {
+    const previous = this._items.find((item) => item.toolId === this._activeTool);
+    const next = this._items.find((item) => item.toolId === toolId);
+    if (!next) {
+      throw new Error(`Unknown tool: ${toolId}`);
+    }
     this._activeTool = toolId;
-    this._onDidChangeTreeData.fire();
+    if (previous && previous !== next) {
+      previous.description = "";
+      previous.contextValue = "tool";
+      this._onDidChangeTreeData.fire(previous);
+    }
+    next.description = "●";
+    next.contextValue = "activeTool";
+    this._onDidChangeTreeData.fire(next);
   }
 
   getTreeItem(element: ToolItem): vscode.TreeItem {
     return element;
   }
 
+  getParent(): undefined {
+    return undefined;
+  }
+
+  getActiveItem(): ToolItem {
+    const item = this._items.find((tool) => tool.toolId === this._activeTool);
+    if (!item) {
+      throw new Error(`Unknown tool: ${this._activeTool}`);
+    }
+    return item;
+  }
+
   getChildren(): ToolItem[] {
-    return TOOLS.map((t) => new ToolItem(t.id, t.label, t.icon, t.id === this._activeTool));
+    return this._items;
   }
 }

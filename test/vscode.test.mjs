@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import * as vscode from "vscode";
+import { NavigatorProvider } from "../src/views/navigator";
 
 async function runCommand(command, text = "") {
   const document = await vscode.workspace.openTextDocument({ content: text });
@@ -24,6 +25,27 @@ async function runCommand(command, text = "") {
 }
 
 export async function run() {
+  const navigator = new NavigatorProvider("password");
+  const items = navigator.getChildren();
+  const passwordItem = navigator.getActiveItem();
+  navigator.setActiveTool("basicAuth");
+  const basicAuthItem = navigator.getActiveItem();
+  assert.equal(passwordItem.description, "");
+  assert.equal(basicAuthItem.description, "●");
+  assert.equal(navigator.getParent(basicAuthItem), undefined);
+  assert.equal(
+    navigator.getChildren().find((item) => item.toolId === "basicAuth"),
+    basicAuthItem
+  );
+  assert.equal(
+    navigator.getChildren().find((item) => item.toolId === "password"),
+    items[0]
+  );
+  navigator.setActiveTool("password");
+  assert.equal(navigator.getActiveItem(), passwordItem);
+  assert.equal(passwordItem.description, "●");
+  assert.equal(basicAuthItem.description, "");
+
   const extension = vscode.extensions.getExtension("ddniel16.gpassword");
   assert.ok(extension, "La extensión instalada no está disponible");
   await extension.activate();
@@ -50,7 +72,15 @@ export async function run() {
   for (const command of ["gpassword.StrapiYml", "gpassword.StrapiEnv"]) {
     assert.equal((await runCommand(command)).trim().split("\n").length, 6);
   }
+
+  const toolConfiguration = vscode.workspace.getConfiguration("gpassword");
+  const configuredDefaultTool = toolConfiguration.get("defaultTool");
+  assert.equal(configuredDefaultTool, "password");
+  await vscode.commands.executeCommand("passwordGenerator.navigator.focus");
+  await vscode.commands.executeCommand("gpassword.switchTool", "basicAuth");
   await vscode.commands.executeCommand("gpassword.switchTool", "url");
+  assert.equal(toolConfiguration.get("defaultTool"), configuredDefaultTool);
+
   if (process.env.GPASSWORD_TEST_RESULT) {
     writeFileSync(process.env.GPASSWORD_TEST_RESULT, "ok");
   }
