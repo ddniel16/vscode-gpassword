@@ -2,8 +2,6 @@
 
 ## Instalación
 
-Se requiere Visual Studio Code 1.140 o posterior.
-
 Con Visual Studio Code abierto, lanza la búsqueda rápida (Ctrl+P), pega el siguiente comando y presiona enter.
 
 > ext install ddniel16.gpassword
@@ -81,14 +79,3 @@ Puedes personalizar la configuración de la extensión a tu gusto. Algunas de la
 Explora los comandos y configura la extensión a tu gusto para mejorar tu seguridad y productividad.
 
 **¡Disfruta usando gPassword & Encoder Tools!**
-
-## Desarrollo
-
-El proyecto utiliza Node.js 24 y pnpm. Para comprobar los cambios, ejecuta `node --run pretest`,
-`node --run test` y `node --run compile`. TypeScript 7 comprueba el proyecto; la API de TypeScript 6
-se mantiene para la compatibilidad con `typescript-eslint`.
-
-Para las pruebas de integración, establece `VSCODE_EXECUTABLE` con la ruta absoluta al ejecutable
-principal de VS Code (no al lanzador de terminal) y ejecuta `node --run test:integration`. Se requiere
-un entorno gráfico. Opcionalmente, `VSCODE_EXTENSION_PATH` permite probar una extensión instalada
-desde un VSIX en lugar del código del proyecto.
