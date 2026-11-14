@@ -26,7 +26,6 @@ Esta extensión combina varias herramientas útiles para desarrolladores, como l
   - Solo letras
   - Letras y números
   - Letras, números y símbolos
-- Convertir contraseñas a hash de Basic Auth (`bcrypt.hashSync`)
 - Generar entradas `.htpasswd` con bcrypt, APR1-MD5, SHA-1, SHA-256 crypt o SHA-512 crypt
   - Ajustar el coste de bcrypt y las rondas de SHA-crypt; APR1-MD5 y SHA-1 mantienen sus parámetros fijos
 - Codificar y decodificar en Base64

@@ -2,7 +2,6 @@ import { workspace, window, commands, type ExtensionContext } from "vscode";
 
 // Import Commands
 import { Base64 } from "./commands/base64";
-import { BasicAuth } from "./commands/basicAuth";
 import { Passwords } from "./commands/passwords";
 import { ExtensionConfig, type ToolId } from "./extensionConfig";
 import { WordPressSalts } from "./commands/wordPressSalts";
@@ -64,13 +63,6 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("gpassword.BaseDecode", () => {
       new Base64(window).decode();
-    })
-  );
-
-  // Generate Basic Auth hash
-  context.subscriptions.push(
-    commands.registerCommand("gpassword.passwordToBasicAuth", () => {
-      new BasicAuth(window).passwordToHash();
     })
   );
 

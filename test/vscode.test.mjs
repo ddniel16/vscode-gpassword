@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import * as vscode from "vscode";
-import bcrypt from "bcryptjs";
 
 async function runCommand(command, text = "") {
   const document = await vscode.workspace.openTextDocument({ content: text });
@@ -36,9 +35,6 @@ export async function run() {
   const encodedUrl = await runCommand("gpassword.UrlEncode", "a & ñ");
   assert.equal(encodedUrl, "a%20%26%20%C3%B1");
   assert.equal(await runCommand("gpassword.UrlDecode", encodedUrl), "a & ñ");
-
-  const hash = await runCommand("gpassword.passwordToBasicAuth", "contraseña");
-  assert.ok(await bcrypt.compare("contraseña", hash));
 
   const token = `${Buffer.from('{"alg":"none"}').toString("base64url")}.${Buffer.from('{"sub":"usuario"}').toString("base64url")}.`;
   const jwt = JSON.parse(await runCommand("gpassword.JWT", token));

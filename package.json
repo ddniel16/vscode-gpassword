@@ -29,11 +29,6 @@
       },
       {
         "category": "gPassword",
-        "command": "gpassword.passwordToBasicAuth",
-        "title": "Replace password to hash of Basic Auth (bcrypt.hashSync)"
-      },
-      {
-        "category": "gPassword",
         "command": "gpassword.BaseEncode",
         "title": "Base64 Encode"
       },
@@ -176,11 +171,6 @@
         },
         {
           "command": "gpassword.BaseEncode",
-          "group": "gpassword",
-          "when": "editorTextFocus && !editorReadonly && editorHasSelection"
-        },
-        {
-          "command": "gpassword.passwordToBasicAuth",
           "group": "gpassword",
           "when": "editorTextFocus && !editorReadonly && editorHasSelection"
         },
