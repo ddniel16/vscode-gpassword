@@ -1,11 +1,18 @@
 import crypto from "node:crypto";
 
+export const AMBIGUOUS_CHARACTERS = "0O1lI|";
+
 interface PasswordOptions {
   numbers: boolean;
   symbols: boolean;
   uppercase: boolean;
   customChars: string;
   length: number;
+  excludeAmbiguous: boolean;
+}
+
+export function filterAmbiguousCharacters(characters: string): string {
+  return [...characters].filter((character) => !AMBIGUOUS_CHARACTERS.includes(character)).join("");
 }
 
 export class PasswordsGenerator {
@@ -37,25 +44,34 @@ export class PasswordsGenerator {
     const numbers = "0123456789";
     const symbols = "[]{}()¿?-_.:,;><|/¡!^*+=@#$%&~`'\"";
     const custom = settings.customChars || "";
+    const filterCharacters = settings.excludeAmbiguous ? filterAmbiguousCharacters : (characters: string) => characters;
 
-    let pool = lower;
-    const setsRequeridos = [lower];
+    let pool = filterCharacters(lower);
+    const setsRequeridos = [pool];
 
     if (settings.uppercase) {
-      pool += upper;
-      setsRequeridos.push(upper);
+      const characterSet = filterCharacters(upper);
+      pool += characterSet;
+      setsRequeridos.push(characterSet);
     }
     if (settings.numbers) {
-      pool += numbers;
-      setsRequeridos.push(numbers);
+      const characterSet = filterCharacters(numbers);
+      pool += characterSet;
+      setsRequeridos.push(characterSet);
     }
     if (settings.symbols) {
-      pool += symbols;
-      setsRequeridos.push(symbols);
+      const characterSet = filterCharacters(symbols);
+      pool += characterSet;
+      setsRequeridos.push(characterSet);
     }
-    if (custom) {
-      pool += custom;
-      setsRequeridos.push(custom);
+    if (custom.length > 0) {
+      const characterSet = filterCharacters(custom);
+      pool += characterSet;
+      setsRequeridos.push(characterSet);
+    }
+
+    if (setsRequeridos.some((characterSet) => characterSet.length === 0)) {
+      throw new Error("No characters remain in a required character set after ambiguous characters are excluded.");
     }
 
     let chars = [];

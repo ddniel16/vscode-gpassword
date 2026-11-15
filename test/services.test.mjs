@@ -14,6 +14,29 @@ test("Base64 y URL conservan texto Unicode", () => {
   assert.throws(() => url.decode("%ZZ"), URIError);
 });
 
+test("Base64URL admite padding opcional y rechaza entradas inválidas", () => {
+  const text = "💩";
+  const encoded = base64.encode(text, "base64url");
+  assert.match(encoded, /^[A-Za-z0-9_-]+$/);
+  assert.equal(base64.decode(encoded, "base64url"), text);
+
+  const padded = base64.encode(text, "base64url", true);
+  assert.ok(padded.endsWith("="));
+  assert.equal(base64.decode(padded, "base64url"), text);
+  assert.throws(() => base64.decode("a*", "base64url"), /Invalid Base64URL/);
+  assert.throws(() => base64.decode("/w=="), /valid UTF-8/);
+});
+
+test("URL distingue componente, URL completa y datos de formulario", () => {
+  const fullUrl = "https://example.com/a b?q=x y#tag";
+  const encodedFullUrl = "https://example.com/a%20b?q=x%20y#tag";
+  assert.equal(url.encode(fullUrl, "uri"), encodedFullUrl);
+  assert.equal(url.decode(encodedFullUrl, "uri"), fullUrl);
+  assert.equal(url.encode("a b+c&ñ", "form"), "a+b%2Bc%26%C3%B1");
+  assert.equal(url.decode("a+b%2Bc%26%C3%B1", "form"), "a b+c&ñ");
+  assert.throws(() => url.decode("%ZZ", "form"), URIError);
+});
+
 test("JWT decodifica sus componentes y rechaza formatos inválidos", () => {
   const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
   const token = `${encode({ alg: "HS256" })}.${encode({ sub: "usuario" })}.signature`;
@@ -36,6 +59,7 @@ test("las contraseñas contienen las categorías seleccionadas", () => {
     numbers: true,
     symbols: true,
     customChars: "€",
+    excludeAmbiguous: false,
   });
   assert.equal(password.length, 20);
   assert.match(password, /[a-z]/);
@@ -43,8 +67,38 @@ test("las contraseñas contienen las categorías seleccionadas", () => {
   assert.match(password, /[0-9]/);
   assert.match(password, /[^\p{L}\p{N}€]/u);
   assert.ok(password.includes("€"));
+  const passwordWithoutAmbiguousCharacters = generator.generatePassword({
+    length: 64,
+    uppercase: true,
+    numbers: true,
+    symbols: true,
+    customChars: "€0",
+    excludeAmbiguous: true,
+  });
+  assert.doesNotMatch(passwordWithoutAmbiguousCharacters, /[0O1lI|]/);
+  assert.ok(passwordWithoutAmbiguousCharacters.includes("€"));
   assert.throws(
-    () => generator.generatePassword({ length: 3, uppercase: false, numbers: false, symbols: false, customChars: "" }),
+    () =>
+      generator.generatePassword({
+        length: 20,
+        uppercase: false,
+        numbers: false,
+        symbols: false,
+        customChars: "0O1lI|",
+        excludeAmbiguous: true,
+      }),
+    /No characters remain/
+  );
+  assert.throws(
+    () =>
+      generator.generatePassword({
+        length: 3,
+        uppercase: false,
+        numbers: false,
+        symbols: false,
+        customChars: "",
+        excludeAmbiguous: false,
+      }),
     /longitud mínima/
   );
 });
@@ -73,8 +127,15 @@ test("la entropía distingue contraseñas vacías de las no vacías", () => {
   const calculator = new EntropyCalculator();
   const empty = calculator.calculateDetailedEntropy("", {});
   const password = calculator.calculateDetailedEntropy("aA1!", { uppercase: true, numbers: true, symbols: true });
+  const withoutAmbiguousCharacters = calculator.calculateDetailedEntropy("aA1!", {
+    uppercase: true,
+    numbers: true,
+    symbols: true,
+    excludeAmbiguous: true,
+  });
   assert.equal(empty.theoreticalBits, 0);
   assert.equal(empty.shannonBits, 0);
   assert.ok(password.theoreticalBits > 0);
   assert.ok(password.shannonBits > 0);
+  assert.ok(withoutAmbiguousCharacters.theoreticalBits < password.theoreticalBits);
 });

@@ -1,44 +1,31 @@
 import * as vscode from "vscode";
 import * as urlService from "../services/url";
+import { transformSelections } from "./selectionTransform";
 
 export class Url {
-  vscodeWindow: typeof vscode.window;
+  constructor(private readonly vscodeWindow: typeof vscode.window) {}
 
-  constructor(vscodeWindow: typeof vscode.window) {
-    this.vscodeWindow = vscodeWindow;
+  encode(): Promise<void> {
+    return transformSelections(this.vscodeWindow, (text) => urlService.encode(text), "Selection URL encoded");
   }
 
-  encode(): void {
-    const activeTextEditor = this.vscodeWindow.activeTextEditor;
-    if (activeTextEditor === undefined) {
-      this.vscodeWindow.showErrorMessage("No open editor");
-      return;
-    }
-
-    activeTextEditor.edit((editBuilder) => {
-      for (const selection of activeTextEditor.selections) {
-        const textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, urlService.encode(textSelected));
-      }
-    });
-
-    this.vscodeWindow.showInformationMessage("Selection URL encoded");
+  decode(): Promise<void> {
+    return transformSelections(this.vscodeWindow, (text) => urlService.decode(text), "Selection URL decoded");
   }
 
-  decode(): void {
-    const activeTextEditor = this.vscodeWindow.activeTextEditor;
-    if (activeTextEditor === undefined) {
-      this.vscodeWindow.showErrorMessage("No open editor");
-      return;
-    }
+  encodeUri(): Promise<void> {
+    return transformSelections(this.vscodeWindow, (text) => urlService.encode(text, "uri"), "Full URL encoded");
+  }
 
-    activeTextEditor.edit((editBuilder) => {
-      for (const selection of activeTextEditor.selections) {
-        const textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, urlService.decode(textSelected));
-      }
-    });
+  decodeUri(): Promise<void> {
+    return transformSelections(this.vscodeWindow, (text) => urlService.decode(text, "uri"), "Full URL decoded");
+  }
 
-    this.vscodeWindow.showInformationMessage("Selection URL decoded");
+  encodeForm(): Promise<void> {
+    return transformSelections(this.vscodeWindow, (text) => urlService.encode(text, "form"), "Form data URL encoded");
+  }
+
+  decodeForm(): Promise<void> {
+    return transformSelections(this.vscodeWindow, (text) => urlService.decode(text, "form"), "Form data URL decoded");
   }
 }

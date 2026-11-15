@@ -26,9 +26,11 @@ Esta extensión combina varias herramientas útiles para desarrolladores, como l
   - Solo letras
   - Letras y números
   - Letras, números y símbolos
+  - Excluir caracteres ambiguos (`0`, `O`, `1`, `l`, `I` y `|`)
 - Generar entradas `.htpasswd` con bcrypt, APR1-MD5, SHA-1, SHA-256 crypt o SHA-512 crypt
   - Ajustar el coste de bcrypt y las rondas de SHA-crypt; APR1-MD5 y SHA-1 mantienen sus parámetros fijos
-- Codificar y decodificar en Base64
+- Codificar y decodificar en Base64 y Base64URL
+- Codificar y decodificar componentes URL, URL completas y datos de formulario
 - Generar salts para WordPress (formato Env o Yaml)
 - Generar tokens para Strapi (formato Env o Yaml)
 - Decodificar JWT
@@ -70,9 +72,10 @@ Puedes personalizar la configuración de la extensión a tu gusto. Algunas de la
 - Sidebar
   - `gpassword.defaultTool`: Herramienta que se selecciona por defecto al abrir el sidebar (`password` por defecto). Se guarda en la configuración de VS Code y cambiar de herramienta desde el sidebar no modifica este ajuste.
   - `gpassword.passwordGeneratorLength`: Longitud por defecto de la contraseña generada (20 por defecto)
-  - `gpassword.passwordGeneratorIncludeNumbers`: Incluir números en la contraseña generada
-  - `gpassword.passwordGeneratorIncludeSymbols`: Incluir símbolos en la contraseña generada
-  - `gpassword.passwordGeneratorIncludeUppercase`: Incluir letras mayúsculas en la contraseña generada
+  - `gpassword.passwordGeneratorDefault.includeNumbers`: Incluir números en la contraseña generada
+  - `gpassword.passwordGeneratorDefault.includeSymbols`: Incluir símbolos en la contraseña generada
+  - `gpassword.passwordGeneratorDefault.includeUppercase`: Incluir letras mayúsculas en la contraseña generada
+  - `gpassword.passwordGeneratorDefault.excludeAmbiguous`: Excluir caracteres ambiguos de las contraseñas generadas por comandos y en la configuración inicial del sidebar
 
 ## ¡Comienza ahora!
 

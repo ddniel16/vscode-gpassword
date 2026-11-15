@@ -46,6 +46,22 @@ textarea::placeholder {
   flex-wrap: wrap;
 }
 
+.options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.options select {
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+}
+
+.error {
+  color: var(--vscode-errorForeground);
+}
+
 button {
   cursor: pointer;
   padding: 6px 14px;

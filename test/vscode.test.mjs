@@ -54,9 +54,21 @@ export async function run() {
   assert.equal(encoded, Buffer.from("contraseña").toString("base64"));
   assert.equal(await runCommand("gpassword.BaseDecode", encoded), "contraseña");
 
+  const encodedBase64Url = await runCommand("gpassword.Base64UrlEncode", "💩");
+  assert.equal(encodedBase64Url, Buffer.from("💩").toString("base64url"));
+  assert.equal(await runCommand("gpassword.Base64UrlDecode", encodedBase64Url), "💩");
+
   const encodedUrl = await runCommand("gpassword.UrlEncode", "a & ñ");
   assert.equal(encodedUrl, "a%20%26%20%C3%B1");
   assert.equal(await runCommand("gpassword.UrlDecode", encodedUrl), "a & ñ");
+
+  const fullUrl = "https://example.com/a b?q=x y#tag";
+  const encodedFullUrl = await runCommand("gpassword.UrlEncodeUri", fullUrl);
+  assert.equal(encodedFullUrl, "https://example.com/a%20b?q=x%20y#tag");
+  assert.equal(await runCommand("gpassword.UrlDecodeUri", encodedFullUrl), fullUrl);
+  const encodedForm = await runCommand("gpassword.UrlEncodeForm", "a b+c&ñ");
+  assert.equal(encodedForm, "a+b%2Bc%26%C3%B1");
+  assert.equal(await runCommand("gpassword.UrlDecodeForm", encodedForm), "a b+c&ñ");
 
   const token = `${Buffer.from('{"alg":"none"}').toString("base64url")}.${Buffer.from('{"sub":"usuario"}').toString("base64url")}.`;
   const jwt = JSON.parse(await runCommand("gpassword.JWT", token));

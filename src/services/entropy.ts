@@ -1,3 +1,9 @@
+const AMBIGUOUS_CHARACTERS = /[0O1lI|]/g;
+
+function filterAmbiguousCharacters(characters: string): string {
+  return characters.replace(AMBIGUOUS_CHARACTERS, "");
+}
+
 export class EntropyCalculator {
   private calculateShannonEntropy(password: string): number {
     const n = password.length;
@@ -76,7 +82,14 @@ export class EntropyCalculator {
 
   public calculateDetailedEntropy(
     password: string,
-    opts: { uppercase?: boolean; numbers?: boolean; symbols?: boolean; custom?: string }
+    opts: {
+      uppercase?: boolean;
+      numbers?: boolean;
+      symbols?: boolean;
+      custom?: string;
+      customChars?: string;
+      excludeAmbiguous?: boolean;
+    }
   ): {
     theoreticalBits: number;
     shannonBits: number;
@@ -86,18 +99,19 @@ export class EntropyCalculator {
     const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const numbers = "0123456789";
     const symbols = "[]{}()¿?-_.:,;><|/¡!^*+=@#$%&~`'\"";
-    const custom = opts.custom || "";
+    const filterCharacters = opts.excludeAmbiguous ? filterAmbiguousCharacters : (characters: string) => characters;
+    const custom = filterCharacters(opts.customChars ?? opts.custom ?? "");
 
-    let poolSize = lower.length; // base
+    let poolSize = filterCharacters(lower).length;
 
     if (opts.uppercase) {
-      poolSize += upper.length;
+      poolSize += filterCharacters(upper).length;
     }
     if (opts.numbers) {
-      poolSize += numbers.length;
+      poolSize += filterCharacters(numbers).length;
     }
     if (opts.symbols) {
-      poolSize += symbols.length;
+      poolSize += filterCharacters(symbols).length;
     }
     if (custom) {
       poolSize += custom.length;

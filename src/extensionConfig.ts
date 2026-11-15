@@ -9,6 +9,7 @@ interface ExtensionConfigType {
     includeNumbers: boolean;
     includeSymbols: boolean;
     includeUppercase: boolean;
+    excludeAmbiguous: boolean;
   };
 }
 

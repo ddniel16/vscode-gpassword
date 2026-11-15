@@ -57,6 +57,16 @@ export function activate(context: ExtensionContext) {
       new Base64(window).decode();
     })
   );
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.Base64UrlEncode", () => {
+      new Base64(window).encodeUrl();
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.Base64UrlDecode", () => {
+      new Base64(window).decodeUrl();
+    })
+  );
 
   // Generate JWT Tokens
   context.subscriptions.push(
@@ -100,6 +110,26 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("gpassword.UrlDecode", () => {
       new Url(window).decode();
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.UrlEncodeUri", () => {
+      new Url(window).encodeUri();
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.UrlDecodeUri", () => {
+      new Url(window).decodeUri();
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.UrlEncodeForm", () => {
+      new Url(window).encodeForm();
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("gpassword.UrlDecodeForm", () => {
+      new Url(window).decodeForm();
     })
   );
 

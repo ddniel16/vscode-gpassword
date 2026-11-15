@@ -6,11 +6,13 @@ import { PasswordsGenerator } from "../services/passwords";
 export class Passwords {
   randomLengthMin: number;
   randomLengthMax: number;
+  excludeAmbiguous: boolean;
   vscodeWindow: typeof vscode.window;
 
   constructor(vscodeWindow: typeof vscode.window, $extConfig: ExtensionConfig) {
     this.randomLengthMin = $extConfig.randomLengthMin;
     this.randomLengthMax = $extConfig.randomLengthMax;
+    this.excludeAmbiguous = $extConfig.passwordGeneratorDefault?.excludeAmbiguous ?? false;
     this.vscodeWindow = vscodeWindow;
 
     if (this.randomLengthMin >= this.randomLengthMax) {
@@ -26,6 +28,7 @@ export class Passwords {
       uppercase: true,
       customChars: "",
       length: this.randomNumber(),
+      excludeAmbiguous: this.excludeAmbiguous,
     });
 
     this.printPassword(password);
@@ -39,6 +42,7 @@ export class Passwords {
       uppercase: true,
       customChars: "",
       length: this.randomNumber(),
+      excludeAmbiguous: this.excludeAmbiguous,
     });
 
     this.printPassword(password);
@@ -52,6 +56,7 @@ export class Passwords {
       uppercase: true,
       customChars: "",
       length: this.randomNumber(),
+      excludeAmbiguous: this.excludeAmbiguous,
     });
 
     this.printPassword(password);

@@ -24,16 +24,23 @@ function handleMessage(webview: vscode.Webview): vscode.Disposable {
           };
         }[] = [];
 
-        listItems.forEach(() => {
-          const pwd = passwordGenerator.generatePassword(payload);
-          const entropy = entropyCalculator.calculateDetailedEntropy(pwd, payload);
-          listGenerate.push({ id: listItems[listGenerate.length], value: pwd, entropy });
-        });
+        try {
+          listItems.forEach(() => {
+            const pwd = passwordGenerator.generatePassword(payload);
+            const entropy = entropyCalculator.calculateDetailedEntropy(pwd, payload);
+            listGenerate.push({ id: listItems[listGenerate.length], value: pwd, entropy });
+          });
 
-        webview.postMessage({
-          type: "listGenerateMessage",
-          payload: listGenerate,
-        });
+          webview.postMessage({
+            type: "listGenerateMessage",
+            payload: listGenerate,
+          });
+        } catch (error) {
+          webview.postMessage({
+            type: "listGenerateError",
+            payload: error instanceof Error ? error.message : "Could not generate passwords.",
+          });
+        }
         break;
       }
       case "copy": {
@@ -54,6 +61,7 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
     includeNumbers: cfg.get<boolean>("passwordGeneratorDefault.includeNumbers", true),
     includeSymbols: cfg.get<boolean>("passwordGeneratorDefault.includeSymbols", true),
     includeUppercase: cfg.get<boolean>("passwordGeneratorDefault.includeUppercase", true),
+    excludeAmbiguous: cfg.get<boolean>("passwordGeneratorDefault.excludeAmbiguous", false),
     customChars: cfg.get<string>("passwordGeneratorDefault.customChars", ""),
   };
   const settingsJson = JSON.stringify(settings).replace(/</g, "\\u003c");
@@ -104,6 +112,11 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
   <label id="upperLabel" for="chkUpper">Uppercase</label>
 </div>
 
+<div class="row">
+  <input type="checkbox" id="chkExcludeAmbiguous" ${settings.excludeAmbiguous ? "checked" : ""}>
+  <label id="excludeAmbiguousLabel" for="chkExcludeAmbiguous">Exclude ambiguous characters (0, O, 1, l, I, |)</label>
+</div>
+
 <div class="col">
   <label id="customLabel" for="custom">Custom chars</label>
   <input id="custom" class="inline-input" type="text" value="${settings.customChars}" placeholder="Extra chars" />
@@ -113,6 +126,7 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
 <hr />
 
 <button id="regenerate" type="button" title="Generate">Regenerate list</button>
+<small id="generationError" class="error" role="alert"></small>
 
 <div class="listItems">
   <div><button id="copy-a" type="button" title="Copy">Copy</button> <code id="result-a"></code> <small class="entropy-data hidden" id="entropy-a"></small><br /></div>
@@ -150,6 +164,7 @@ element('length').addEventListener('change', listGenerate);
 element('chkNumbers').addEventListener('change', listGenerate);
 element('chkSymbols').addEventListener('change', listGenerate);
 element('chkUpper').addEventListener('change', listGenerate);
+element('chkExcludeAmbiguous').addEventListener('change', listGenerate);
 element('custom').addEventListener('input', listGenerate);
 
 element('chkEntropy').addEventListener('change', (event) => {
@@ -164,11 +179,13 @@ element('chkEntropy').addEventListener('change', (event) => {
 
 element('regenerate').addEventListener('click', listGenerate);
 function listGenerate() {
+  element('generationError').textContent = '';
   const localValues = {
     length: parseInt(element('length').value, 10),
     numbers: element('chkNumbers').checked,
     symbols: element('chkSymbols').checked,
     uppercase: element('chkUpper').checked,
+    excludeAmbiguous: element('chkExcludeAmbiguous').checked,
     customChars: element('custom').value
   };
   vscode.postMessage({ type: 'listGenerate', payload: localValues });
@@ -177,6 +194,7 @@ listGenerate();
 
 window.addEventListener('message', (event) => {
   if (event.data.type === 'listGenerateMessage') {
+    element('generationError').textContent = '';
     event.data.payload.forEach(item => {
       const codeEl = element("result-"+ item.id);
       if (codeEl) {
@@ -192,6 +210,12 @@ window.addEventListener('message', (event) => {
       if (entropyEl) {
         entropyEl.textContent = 'Entropy: T=' + item.entropy.theoreticalBits.toFixed(2) + ' bits, S=' + item.entropy.shannonBits.toFixed(2) + ' bits (' + item.entropy.score.replace('-', ' ') + ')';
       }
+    });
+  } else if (event.data.type === 'listGenerateError') {
+    element('generationError').textContent = event.data.payload;
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'].forEach(id => {
+      element('result-' + id).textContent = '';
+      element('entropy-' + id).textContent = '';
     });
   }
 });

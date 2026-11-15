@@ -1,44 +1,35 @@
 import * as vscode from "vscode";
 import * as base64Service from "../services/base64";
+import { transformSelections } from "./selectionTransform";
 
 export class Base64 {
-  vscodeWindow: typeof vscode.window;
+  constructor(private readonly vscodeWindow: typeof vscode.window) {}
 
-  constructor(vscodeWindow: typeof vscode.window) {
-    this.vscodeWindow = vscodeWindow;
+  encode(): Promise<void> {
+    return transformSelections(this.vscodeWindow, (text) => base64Service.encode(text), "Selection encoded to Base64");
   }
 
-  encode(): void {
-    const activeTextEditor = this.vscodeWindow.activeTextEditor;
-    if (activeTextEditor === undefined) {
-      this.vscodeWindow.showErrorMessage("No open editor");
-      return;
-    }
-
-    activeTextEditor.edit((editBuilder) => {
-      for (const selection of activeTextEditor.selections) {
-        const textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, base64Service.encode(textSelected));
-      }
-    });
-
-    this.vscodeWindow.showInformationMessage("Selection encoded to Base64");
+  decode(): Promise<void> {
+    return transformSelections(
+      this.vscodeWindow,
+      (text) => base64Service.decode(text),
+      "Selection decoded from Base64"
+    );
   }
 
-  decode(): void {
-    const activeTextEditor = this.vscodeWindow.activeTextEditor;
-    if (activeTextEditor === undefined) {
-      this.vscodeWindow.showErrorMessage("No open editor");
-      return;
-    }
+  encodeUrl(): Promise<void> {
+    return transformSelections(
+      this.vscodeWindow,
+      (text) => base64Service.encode(text, "base64url", false),
+      "Selection encoded to Base64URL"
+    );
+  }
 
-    activeTextEditor.edit((editBuilder) => {
-      for (const selection of activeTextEditor.selections) {
-        const textSelected = activeTextEditor.document.getText(selection);
-        editBuilder.replace(selection, base64Service.decode(textSelected));
-      }
-    });
-
-    this.vscodeWindow.showInformationMessage("Selection decoded from Base64");
+  decodeUrl(): Promise<void> {
+    return transformSelections(
+      this.vscodeWindow,
+      (text) => base64Service.decode(text, "base64url"),
+      "Selection decoded from Base64URL"
+    );
   }
 }

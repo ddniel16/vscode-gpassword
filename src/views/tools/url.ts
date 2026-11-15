@@ -10,24 +10,24 @@ function handleMessage(webview: vscode.Webview): vscode.Disposable {
     switch (type) {
       case "encode": {
         try {
-          const encoded = urlService.encode(payload);
+          const encoded = urlService.encode(payload.text, payload.format);
           webview.postMessage({ type: "result", payload: encoded });
         } catch (error) {
           webview.postMessage({
-            type: "result",
-            payload: `Error: ${error instanceof Error ? error.message : "Encoding error"}`,
+            type: "error",
+            payload: error instanceof Error ? error.message : "Encoding error",
           });
         }
         break;
       }
       case "decode": {
         try {
-          const decoded = urlService.decode(payload);
+          const decoded = urlService.decode(payload.text, payload.format);
           webview.postMessage({ type: "result", payload: decoded });
         } catch (error) {
           webview.postMessage({
-            type: "result",
-            payload: `Error: ${error instanceof Error ? error.message : "Decoding error"}`,
+            type: "error",
+            payload: error instanceof Error ? error.message : "Decoding error",
           });
         }
         break;
@@ -74,12 +74,22 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
 <div class="container">
   <textarea id="inputText" placeholder="Paste your text here to URL encode/decode..."></textarea>
 
+  <div class="options">
+    <label for="format">Format</label>
+    <select id="format">
+      <option value="component">URL component</option>
+      <option value="uri">Full URL</option>
+      <option value="form">Form data</option>
+    </select>
+  </div>
+
   <div class="button-group">
     <button id="encodeBtn" class="button">Encode</button>
     <button id="decodeBtn" class="button">Decode</button>
     <button id="copyBtn" class="button button-secondary">Copy</button>
     <button id="clearBtn" class="button button-secondary">Clear</button>
   </div>
+  <small id="status" class="error" role="status"></small>
 </div>
 
 <script nonce="${nonce}">
@@ -90,18 +100,22 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
   const decodeBtn = document.getElementById('decodeBtn');
   const copyBtn = document.getElementById('copyBtn');
   const clearBtn = document.getElementById('clearBtn');
+  const format = document.getElementById('format');
+  const status = document.getElementById('status');
 
   encodeBtn.addEventListener('click', () => {
     const text = textarea.value;
     if (text) {
-      vscode.postMessage({ type: 'encode', payload: text });
+      status.textContent = '';
+      vscode.postMessage({ type: 'encode', payload: { text, format: format.value } });
     }
   });
 
   decodeBtn.addEventListener('click', () => {
     const text = textarea.value;
     if (text) {
-      vscode.postMessage({ type: 'decode', payload: text });
+      status.textContent = '';
+      vscode.postMessage({ type: 'decode', payload: { text, format: format.value } });
     }
   });
 
@@ -114,12 +128,16 @@ function getHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
 
   clearBtn.addEventListener('click', () => {
     textarea.value = '';
+    status.textContent = '';
   });
 
   window.addEventListener('message', (event) => {
     const message = event.data;
     if (message.type === 'result') {
       textarea.value = message.payload;
+      status.textContent = '';
+    } else if (message.type === 'error') {
+      status.textContent = message.payload;
     }
   });
 })();
