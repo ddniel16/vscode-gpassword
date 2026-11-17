@@ -74,6 +74,15 @@ export async function run() {
   const jwt = JSON.parse(await runCommand("gpassword.JWT", token));
   assert.deepEqual(jwt.payload, { sub: "usuario" });
 
+  const invalidJwtDocument = await vscode.workspace.openTextDocument({ content: "invalid.jwt" });
+  const invalidJwtEditor = await vscode.window.showTextDocument(invalidJwtDocument);
+  invalidJwtEditor.selection = new vscode.Selection(
+    invalidJwtDocument.positionAt(0),
+    invalidJwtDocument.positionAt(invalidJwtDocument.getText().length)
+  );
+  await vscode.commands.executeCommand("gpassword.JWT");
+  assert.equal(invalidJwtDocument.getText(), "invalid.jwt");
+
   for (const command of ["gpassword.Letters", "gpassword.LettersNumbers", "gpassword.AllCharacters"]) {
     const password = await runCommand(command);
     assert.ok(password.length >= 20 && password.length <= 25);

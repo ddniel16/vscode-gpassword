@@ -1,8 +1,16 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import { test } from "node:test";
 import * as base64 from "../src/services/base64.ts";
 import * as url from "../src/services/url.ts";
-import { decodeJWT, validateJWT } from "../src/services/jwt.ts";
+import {
+  analyzeJWT,
+  decodeJWT,
+  inspectTemporalClaims,
+  JwtError,
+  validateJWT,
+  verifyJWTSignature,
+} from "../src/services/jwt.ts";
 import { PasswordsGenerator } from "../src/services/passwords.ts";
 import { generateStrapiTokens, generateWordPressSalts, generateWPSalt } from "../src/services/salts.ts";
 import { EntropyCalculator } from "../src/services/entropy.ts";
@@ -37,18 +45,91 @@ test("URL distingue componente, URL completa y datos de formulario", () => {
   assert.throws(() => url.decode("%ZZ", "form"), URIError);
 });
 
-test("JWT decodifica sus componentes y rechaza formatos inválidos", () => {
-  const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
-  const token = `${encode({ alg: "HS256" })}.${encode({ sub: "usuario" })}.signature`;
+function encodeJwtSegment(value) {
+  return Buffer.from(JSON.stringify(value)).toString("base64url");
+}
+
+function createJwt(header, payload, secret = "secreto") {
+  const encodedHeader = encodeJwtSegment(header);
+  const encodedPayload = encodeJwtSegment(payload);
+  const signature = crypto
+    .createHmac("sha256", secret)
+    .update(`${encodedHeader}.${encodedPayload}`)
+    .digest("base64url");
+  return `${encodedHeader}.${encodedPayload}.${signature}`;
+}
+
+test("JWT decodifica Base64URL estrictamente y rechaza segmentos inválidos", () => {
+  const signature = Buffer.from("signature").toString("base64url");
+  const token = `${encodeJwtSegment({ alg: "HS256" })}.${encodeJwtSegment({ sub: "usuario" })}.${signature}`;
   assert.deepEqual(validateJWT(token), { valid: true });
   assert.deepEqual(decodeJWT(token), {
     header: { alg: "HS256" },
     payload: { sub: "usuario" },
-    signature: "signature",
+    signature,
   });
   assert.equal(validateJWT("uno.dos").valid, false);
   assert.equal(validateJWT("uno.dos.+").valid, false);
-  assert.throws(() => decodeJWT("invalid.invalid.signature"), SyntaxError);
+  assert.equal(validateJWT("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0./").valid, false);
+  assert.throws(() => decodeJWT("a.eyJzdWIiOiJ1c2VyIn0."), JwtError);
+  assert.throws(
+    () => decodeJWT(`${encodeJwtSegment({ alg: "HS256" })}.${Buffer.from("{").toString("base64url")}.`),
+    /payload is not valid JSON/
+  );
+  assert.deepEqual(decodeJWT(`${encodeJwtSegment({ alg: "none" })}.${encodeJwtSegment({ sub: "usuario" })}.`).payload, {
+    sub: "usuario",
+  });
+});
+
+test("JWT analiza exp y nbf en segundos y distingue claims inválidos", () => {
+  const temporal = inspectTemporalClaims({ exp: 100, nbf: 200 }, 100);
+  assert.deepEqual(temporal, {
+    exp: { status: "expired", value: 100 },
+    nbf: { status: "not-yet-valid", value: 200 },
+    withinValidityWindow: false,
+  });
+
+  const atNotBefore = inspectTemporalClaims({ exp: 300, nbf: 200 }, 200);
+  assert.equal(atNotBefore.exp.status, "valid");
+  assert.equal(atNotBefore.nbf.status, "valid");
+  assert.equal(atNotBefore.withinValidityWindow, true);
+
+  const absent = inspectTemporalClaims({}, 100);
+  assert.equal(absent.exp.status, "missing");
+  assert.equal(absent.nbf.status, "missing");
+  assert.equal(absent.withinValidityWindow, true);
+
+  const invalid = inspectTemporalClaims({ exp: "100", nbf: null }, 100);
+  assert.equal(invalid.exp.status, "invalid");
+  assert.equal(invalid.nbf.status, "invalid");
+  assert.equal(invalid.withinValidityWindow, false);
+
+  assert.equal(analyzeJWT(createJwt({ alg: "HS256" }, { exp: 200 }), 100).temporal.exp.status, "valid");
+});
+
+test("JWT verifica firmas HS256 y rechaza algoritmos o firmas inválidas", () => {
+  const token = createJwt({ alg: "HS256" }, { sub: "usuario" });
+  assert.deepEqual(verifyJWTSignature(token, "secreto"), { valid: true, algorithm: "HS256" });
+  assert.deepEqual(verifyJWTSignature(token, "clave-incorrecta"), {
+    valid: false,
+    algorithm: "HS256",
+    reason: "invalid-signature",
+  });
+
+  const unsupported = createJwt({ alg: "HS512" }, { sub: "usuario" });
+  assert.deepEqual(verifyJWTSignature(unsupported, "secreto"), {
+    valid: false,
+    algorithm: "HS512",
+    reason: "unsupported-algorithm",
+  });
+
+  const [header, payload] = token.split(".");
+  assert.deepEqual(verifyJWTSignature(`${header}.${payload}.AQ`, "secreto"), {
+    valid: false,
+    algorithm: "HS256",
+    reason: "invalid-signature",
+  });
+  assert.throws(() => verifyJWTSignature(token, ""), /Enter the HS256 secret/);
 });
 
 test("las contraseñas contienen las categorías seleccionadas", () => {

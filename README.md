@@ -33,7 +33,8 @@ Esta extensión combina varias herramientas útiles para desarrolladores, como l
 - Codificar y decodificar componentes URL, URL completas y datos de formulario
 - Generar salts para WordPress (formato Env o Yaml)
 - Generar tokens para Strapi (formato Env o Yaml)
-- Decodificar JWT
+- Decodificar JWT y analizar sus claims `exp` y `nbf`
+  - Verificar firmas HS256; decodificar un token no implica que su firma esté verificada
 
 ## ¿Cómo usarla?
 

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { validateJWT, decodeJWT } from "../services/jwt";
+import { decodeJWT, JwtError } from "../services/jwt";
 
 export class JWT {
   vscodeWindow: typeof vscode.window;
@@ -27,17 +27,11 @@ export class JWT {
       return;
     }
 
-    const validation = validateJWT(textSelected);
-    if (!validation.valid) {
-      this.vscodeWindow.showErrorMessage(validation.error ?? "Invalid JWT");
-      return;
-    }
-
     let decodedText;
     try {
       decodedText = decodeJWT(textSelected);
-    } catch {
-      this.vscodeWindow.showErrorMessage("Error decoding JWT");
+    } catch (error) {
+      this.vscodeWindow.showErrorMessage(error instanceof JwtError ? error.message : "Could not decode JWT.");
       return;
     }
 

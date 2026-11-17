@@ -22,6 +22,22 @@ h4 {
   margin-top: 12px;
 }
 
+.field,
+.verify-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label,
+.verify-controls label {
+  font-weight: 600;
+}
+
+.row {
+  margin-top: 12px;
+}
+
 code {
   font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
   font-size: 15px;
@@ -30,8 +46,9 @@ code {
 }
 
 textarea {
-  width: 98%;
-  min-height: 85px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 90px;
   font-family: var(--vscode-editor-font-family, monospace);
   resize: vertical;
   padding: .4rem;
@@ -47,11 +64,11 @@ textarea:focus {
   outline-offset: -1px;
 }
 
-input[type="text"] {
+input[type="password"] {
+  box-sizing: border-box;
   font-size: 15px;
   padding: .2rem;
-  margin-right: 8px;
-  width: 98%;
+  width: 100%;
   font-family: var(--vscode-font-family);
   color: var(--vscode-input-foreground);
   background: var(--vscode-input-background);
@@ -59,7 +76,7 @@ input[type="text"] {
   border-radius: 2px;
 }
 
-input[type="text"]:focus {
+input[type="password"]:focus {
   outline: 1px solid var(--vscode-focusBorder);
   outline-offset: -1px;
 }
@@ -82,6 +99,11 @@ button:hover {
 
 button:active {
   opacity: 0.9;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 button:focus {
